@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shreyansh Upadhyay | Legal Intelligence Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Poppins:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════
+   ROOT & RESET
+═══════════════════════════════════════════════════════ */
+:root{
+  --navy:#0F172A;
+  --navy2:#131f35;
+  --navy3:#1a2744;
+  --blue:#3B82F6;
+  --blue-dim:rgba(59,130,246,0.15);
+  --blue-glow:rgba(59,130,246,0.3);
+  --gold:#F59E0B;
+  --gold-dim:rgba(245,158,11,0.15);
+  --gold-glow:rgba(245,158,11,0.3);
+  --green:#22C55E;
+  --green-dim:rgba(34,197,94,0.12);
+  --text:#E5E7EB;
+  --muted:#94A3B8;
+  --border:rgba(255,255,255,0.06);
+  --card:rgba(255,255,255,0.04);
+  --glass:rgba(15,23,42,0.8);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Poppins',sans-serif;
+  background:var(--navy);
+  color:var(--text);
+  overflow-x:hidden;
+  cursor:none;
+}
+a{text-decoration:none;color:inherit;}
+button{font-family:inherit;cursor:none;}
+img{max-width:100%;}
+
+/* ═══════════════════════════════════════════════════════
+   CUSTOM CURSOR
+═══════════════════════════════════════════════════════ */
+.cur-dot{
+  width:6px;height:6px;background:var(--blue);border-radius:50%;
+  position:fixed;z-index:99999;pointer-events:none;
+  transform:translate(-50%,-50%);transition:width .15s,height .15s,background .2s;
+}
+.cur-ring{
+  width:30px;height:30px;border:1.5px solid var(--blue);border-radius:50%;
+  position:fixed;z-index:99998;pointer-events:none;
+  transform:translate(-50%,-50%);transition:all .2s ease;opacity:.5;
+}
+.cur-ring.active{width:48px;height:48px;opacity:.2;border-color:var(--gold);}
+
+/* ═══════════════════════════════════════════════════════
+   CANVAS BG
+═══════════════════════════════════════════════════════ */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+/* ═══════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:.9rem 3rem;
+  background:rgba(15,23,42,0.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  transition:all .3s;
+}
+.nav-logo{
+  font-family:'Playfair Display',serif;
+  font-size:1.05rem;color:var(--text);
+  display:flex;align-items:center;gap:.6rem;
+}
+.nav-logo span{color:var(--gold);}
+.nav-links{display:flex;gap:.2rem;list-style:none;}
+.nav-links a{
+  font-size:.68rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);padding:.45rem .9rem;
+  border-radius:4px;transition:all .25s;
+  position:relative;
+}
+.nav-links a:hover,.nav-links a.active{color:var(--text);}
+.nav-links a.active::after{
+  content:'';position:absolute;bottom:-1px;left:.9rem;right:.9rem;
+  height:2px;background:var(--blue);border-radius:2px;
+}
+.nav-cta{
+  font-size:.65rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;
+  padding:.5rem 1.3rem;background:var(--blue);color:#fff;border:none;
+  border-radius:4px;transition:all .3s;
+}
+.nav-cta:hover{background:#2563EB;box-shadow:0 0 20px var(--blue-glow);}
+.nav-linkedin{
+  width:32px;height:32px;border-radius:6px;
+  background:rgba(10,102,194,0.2);border:1px solid rgba(10,102,194,0.4);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .3s;color:#0A66C2;font-size:.9rem;
+  text-decoration:none;margin-left:.5rem;
+}
+.nav-linkedin:hover{background:rgba(10,102,194,0.35);box-shadow:0 0 12px rgba(10,102,194,0.4);}
+
+/* mobile menu */
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:none;padding:.4rem;}
+.hamburger span{width:22px;height:1.5px;background:var(--muted);display:block;transition:all .3s;}
+.mobile-menu{
+  display:none;position:fixed;top:60px;left:0;right:0;
+  background:rgba(15,23,42,0.97);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);z-index:490;
+  padding:1.5rem 2rem;
+}
+.mobile-menu.open{display:flex;flex-direction:column;gap:.8rem;}
+.mobile-menu a{
+  font-size:.8rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);padding:.6rem 0;border-bottom:1px solid var(--border);
+  transition:color .25s;
+}
+.mobile-menu a:hover{color:var(--gold);}
+
+/* ═══════════════════════════════════════════════════════
+   PAGE SYSTEM
+═══════════════════════════════════════════════════════ */
+.page{
+  display:none;min-height:100vh;position:relative;z-index:10;
+  padding-top:70px;
+}
+.page.active{display:block;}
+
+/* ═══════════════════════════════════════════════════════
+   SECTION WRAPPERS
+═══════════════════════════════════════════════════════ */
+.section{padding:5rem 0;}
+.container{max-width:1200px;margin:0 auto;padding:0 2rem;}
+.section-label{
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;
+  letter-spacing:.35em;text-transform:uppercase;color:var(--blue);
+  margin-bottom:.8rem;display:flex;align-items:center;gap:.8rem;
+}
+.section-label::before{content:'';width:30px;height:1px;background:var(--blue);}
+.section-title{
+  font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3rem);
+  font-weight:700;line-height:1.1;margin-bottom:.6rem;
+}
+.section-title .gold{color:var(--gold);}
+.section-title .blue{color:var(--blue);}
+.section-sub{color:var(--muted);font-size:.95rem;font-weight:300;line-height:1.7;max-width:600px;}
+
+/* ═══════════════════════════════════════════════════════
+   GLASS CARDS
+═══════════════════════════════════════════════════════ */
+.glass{
+  background:var(--card);
+  border:1px solid var(--border);
+  backdrop-filter:blur(12px);
+  transition:all .35s;
+}
+.glass:hover{
+  border-color:rgba(59,130,246,.3);
+  box-shadow:0 8px 32px rgba(0,0,0,.3),0 0 20px var(--blue-dim);
+  transform:translateY(-4px);
+}
+
+/* ═══════════════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════════════ */
+.btn{
+  display:inline-flex;align-items:center;gap:.5rem;
+  font-size:.72rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  padding:.8rem 1.8rem;border:none;border-radius:4px;
+  cursor:none;transition:all .3s;position:relative;overflow:hidden;
+}
+.btn::before{
+  content:'';position:absolute;inset:0;
+  background:rgba(255,255,255,.08);transform:scaleX(0);transform-origin:left;
+  transition:transform .4s;
+}
+.btn:hover::before{transform:scaleX(1);}
+.btn-primary{background:var(--blue);color:#fff;}
+.btn-primary:hover{box-shadow:0 0 30px var(--blue-glow);}
+.btn-gold{background:var(--gold);color:#0F172A;}
+.btn-gold:hover{box-shadow:0 0 30px var(--gold-glow);}
+.btn-outline{background:transparent;color:var(--blue);border:1px solid var(--blue);}
+.btn-outline:hover{background:var(--blue-dim);}
+.btn-outline-gold{background:transparent;color:var(--gold);border:1px solid var(--gold);}
+.btn-outline-gold:hover{background:var(--gold-dim);}
+
+/* ═══════════════════════════════════════════════════════
+   DIVIDER
+═══════════════════════════════════════════════════════ */
+.divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--blue),var(--gold),var(--blue),transparent);
+  opacity:.2;margin:3rem 0;
+}
+.scale-divider{
+  display:flex;align-items:center;gap:1rem;margin:2rem 0;
+  color:var(--muted);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;
+}
+.scale-divider::before,.scale-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ═══════════════════════════════════════════════════════
+   PAGE 1: HOME
+═══════════════════════════════════════════════════════ */
+#home{
+  min-height:100vh;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;text-align:center;
+  position:relative;overflow:hidden;
+  background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(59,130,246,.07) 0%,transparent 60%),
+             radial-gradient(ellipse 50% 40% at 20% 80%,rgba(245,158,11,.05) 0%,transparent 50%);
+}
+.hero-badge{
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;
+  letter-spacing:.3em;text-transform:uppercase;
+  padding:.4rem 1.2rem;border:1px solid rgba(59,130,246,.3);
+  color:var(--blue);border-radius:20px;margin-bottom:1.5rem;
+  background:var(--blue-dim);
+  display:inline-flex;align-items:center;gap:.6rem;
+  animation:fadeDown .8s ease forwards;opacity:0;
+}
+.hero-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse2 2s infinite;}
+@keyframes pulse2{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.7);}}
+.hero-name{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.8rem,7vw,6.5rem);
+  font-weight:700;line-height:1.0;
+  animation:fadeUp .9s ease forwards .2s;opacity:0;
+}
+.hero-name .line1{display:block;color:var(--text);}
+.hero-name .line2{display:block;color:var(--gold);font-style:italic;}
+.hero-roles{
+  display:flex;justify-content:center;align-items:center;gap:1.5rem;flex-wrap:wrap;
+  margin:1.2rem 0;
+  animation:fadeUp .9s ease forwards .4s;opacity:0;
+}
+.hero-role-tag{
+  font-family:'JetBrains Mono',monospace;font-size:.7rem;
+  letter-spacing:.2em;text-transform:uppercase;
+  padding:.35rem .9rem;border-radius:3px;
+}
+.tag-law{border:1px solid var(--gold);color:var(--gold);background:var(--gold-dim);}
+.tag-data{border:1px solid var(--blue);color:var(--blue);background:var(--blue-dim);}
+.tag-tech{border:1px solid var(--green);color:var(--green);background:var(--green-dim);}
+.hero-tagline{
+  font-size:1.05rem;font-weight:300;color:var(--muted);max-width:620px;
+  line-height:1.8;margin:1rem auto 2.5rem;
+  font-style:italic;
+  animation:fadeUp .9s ease forwards .6s;opacity:0;
+}
+.hero-tagline strong{color:var(--text);font-weight:500;font-style:normal;}
+.hero-btns{
+  display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;
+  animation:fadeUp .9s ease forwards .8s;opacity:0;
+}
+.hero-scroll{
+  position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:.5rem;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.2em;
+  color:var(--muted);animation:fadeIn 1s ease forwards 1.5s;opacity:0;
+}
+.scroll-line{width:1px;height:50px;background:linear-gradient(to bottom,var(--blue),transparent);animation:scrollDrop 2s ease-in-out infinite;}
+@keyframes scrollDrop{0%{transform:scaleY(0);transform-origin:top;}50%{transform:scaleY(1);}100%{transform:scaleY(0);transform-origin:bottom;}}
+
+/* METRICS */
+.metrics-strip{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;
+  margin-top:4rem;padding-top:4rem;border-top:1px solid var(--border);
+}
+.metric-card{
+  padding:1.5rem;text-align:center;
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  position:relative;overflow:hidden;
+  transition:all .3s;
+}
+.metric-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--blue-dim),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.metric-card:hover::before{opacity:1;}
+.metric-card:hover{border-color:rgba(59,130,246,.3);transform:translateY(-3px);}
+.metric-num{
+  font-family:'Playfair Display',serif;font-size:3rem;font-weight:700;
+  color:var(--blue);line-height:1;display:block;
+}
+.metric-num.gold{color:var(--gold);}
+.metric-num.green{color:var(--green);}
+.metric-label{font-size:.72rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:.4rem;}
+
+/* ═══════════════════════════════════════════════════════
+   PAGE 2: ABOUT
+═══════════════════════════════════════════════════════ */
+.about-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:5rem;align-items:start;}
+.about-photo-wrap{position:relative;padding:1.5rem;}
+.about-photo-wrap::before{
+  content:'';position:absolute;top:0;left:0;
+  width:70%;height:70%;border-top:2px solid var(--gold);border-left:2px solid var(--gold);
+  border-radius:4px 0 0 0;
+}
+.about-photo-wrap::after{
+  content:'';position:absolute;bottom:0;right:0;
+  width:70%;height:70%;border-bottom:2px solid var(--blue);border-right:2px solid var(--blue);
+  border-radius:0 0 4px 0;
+}
+.about-initials{
+  width:100%;aspect-ratio:3/4;
+  background:linear-gradient(145deg,var(--navy3),var(--navy2));
+  border:1px solid var(--border);border-radius:4px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;z-index:1;
+}
+.about-initials .big{font-family:'Playfair Display',serif;font-size:7rem;font-weight:700;color:var(--blue);opacity:.25;line-height:1;}
+.about-initials .sub{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--gold);text-transform:uppercase;margin-top:.5rem;}
+.about-initials .status-row{
+  display:flex;align-items:center;gap:.5rem;margin-top:1rem;
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--green);
+}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse2 2s infinite;}
+.about-right{}
+.about-bio{font-size:.95rem;font-weight:300;line-height:1.9;color:var(--muted);margin-bottom:2rem;}
+.about-bio strong{color:var(--text);font-weight:500;}
+
+/* SKILL BARS */
+.skill-bars{display:flex;flex-direction:column;gap:1rem;margin-top:2rem;}
+.skill-bar-item{}
+.skill-bar-header{display:flex;justify-content:space-between;margin-bottom:.4rem;}
+.skill-bar-name{font-size:.78rem;font-weight:500;display:flex;align-items:center;gap:.5rem;}
+.skill-bar-name .dot{width:6px;height:6px;border-radius:50%;}
+.skill-bar-pct{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);}
+.skill-bar-track{height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;}
+.skill-bar-fill{height:100%;border-radius:2px;width:0;transition:width 1.5s ease;}
+
+/* RADAR CHART */
+.radar-wrap{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:1.5rem;margin-top:2rem;
+}
+.radar-title{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.25em;text-transform:uppercase;color:var(--blue);margin-bottom:1rem;}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:2rem;margin-top:3rem;}
+.timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--blue),var(--gold),transparent);}
+.tl-item{position:relative;padding:0 0 2.5rem 2.5rem;}
+.tl-item::before{
+  content:'';position:absolute;left:-4.5px;top:.4rem;
+  width:9px;height:9px;border-radius:50%;border:2px solid var(--navy);
+}
+.tl-item.blue-dot::before{background:var(--blue);box-shadow:0 0 8px var(--blue);}
+.tl-item.gold-dot::before{background:var(--gold);box-shadow:0 0 8px var(--gold);}
+.tl-item.green-dot::before{background:var(--green);box-shadow:0 0 8px var(--green);}
+.tl-year{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--blue);letter-spacing:.1em;margin-bottom:.3rem;}
+.tl-title{font-size:1rem;font-weight:600;margin-bottom:.2rem;}
+.tl-sub{font-size:.82rem;color:var(--muted);}
+
+/* ═══════════════════════════════════════════════════════
+   PAGE 3: LEGAL EXPERIENCE
+═══════════════════════════════════════════════════════ */
+.exp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:1.5rem;}
+.exp-card{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:1.8rem;transition:all .35s;cursor:none;
+  position:relative;overflow:hidden;
+}
+.exp-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),var(--gold));
+  transform:scaleX(0);transform-origin:left;transition:transform .4s;
+}
+.exp-card:hover::before{transform:scaleX(1);}
+.exp-card:hover{border-color:rgba(59,130,246,.25);transform:translateY(-5px);box-shadow:0 16px 40px rgba(0,0,0,.3);}
+.exp-type{
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.25em;
+  text-transform:uppercase;color:var(--blue);margin-bottom:1rem;
+  display:flex;align-items:center;gap:.5rem;
+}
+.exp-type::before{content:'';width:20px;height:1px;background:var(--blue);}
+.exp-org{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:600;margin-bottom:.3rem;}
+.exp-date-loc{font-size:.75rem;color:var(--muted);margin-bottom:1.2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.exp-date-loc span{display:flex;align-items:center;gap:.3rem;}
+.exp-bullets{list-style:none;display:flex;flex-direction:column;gap:.5rem;}
+.exp-bullets li{
+  font-size:.82rem;color:var(--muted);padding-left:1rem;position:relative;line-height:1.5;
+}
+.exp-bullets li::before{content:'›';position:absolute;left:0;color:var(--blue);}
+.exp-tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1.2rem;}
+.exp-tag{
+  font-size:.62rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;
+  padding:.25rem .6rem;border-radius:3px;
+  background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,130,246,.2);
+}
+.exp-tag.gold{background:var(--gold-dim);color:var(--gold);border-color:rgba(245,158,11,.2);}
+.exp-tag.green{background:var(--green-dim);color:var(--green);border-color:rgba(34,197,94,.2);}
+
+/* ═══════════════════════════════════════════════════════
+   PAGE 4: DATA SCIENCE
+═══════════════════════════════════════════════════════ */
+.ds-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;}
+.tech-orbit{
+  position:relative;width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+}
+.orbit-center{
+  width:100px;height:100px;border-radius:50%;
+  background:linear-gradient(135deg,var(--navy3),var(--navy2));
+  border:2px solid var(--blue);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;z-index:10;
+  box-shadow:0 0 30px var(--blue-glow);
+}
+.orbit-center .oc-icon{font-size:1.8rem;}
+.orbit-center .oc-label{font-size:.55rem;font-family:'JetBrains Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);margin-top:.2rem;}
+.orbit-ring{
+  position:absolute;border-radius:50%;border-style:solid;border-color:var(--border);
+  border-width:1px;
+}
+.ring1{width:180px;height:180px;animation:spin 20s linear infinite;}
+.ring2{width:270px;height:270px;animation:spin 30s linear infinite reverse;}
+.ring3{width:360px;height:360px;animation:spin 40s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.orbit-node{
+  position:absolute;width:44px;height:44px;border-radius:50%;
+  background:var(--navy2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;transition:all .3s;cursor:none;
+  box-shadow:0 0 10px rgba(0,0,0,.5);
+}
+.orbit-node:hover{transform:scale(1.3);border-color:var(--gold);box-shadow:0 0 15px var(--gold-glow);}
+.n1-1{top:-22px;left:calc(50% - 22px);}
+.n1-2{bottom:-22px;left:calc(50% - 22px);}
+.n2-1{top:-22px;left:calc(50% - 22px);}
+.n2-2{right:-22px;top:calc(50% - 22px);}
+.n2-3{bottom:-22px;left:calc(50% - 22px);}
+.n2-4{left:-22px;top:calc(50% - 22px);}
+.n3-1{top:-22px;left:calc(50% - 22px);}
+.n3-2{right:-22px;top:calc(50% - 22px);}
+.n3-3{bottom:-22px;left:calc(50% - 22px);}
+.n3-4{left:-22px;top:calc(50% - 22px);}
+
+/* CODE BLOCK */
+.code-block{
+  background:var(--navy2);border:1px solid var(--border);border-radius:8px;
+  overflow:hidden;margin-top:1.5rem;
+}
+.code-header{
+  background:rgba(255,255,255,.03);border-bottom:1px solid var(--border);
+  padding:.7rem 1rem;display:flex;align-items:center;gap:.5rem;
+}
+.code-dot{width:10px;height:10px;border-radius:50%;}
+.code-title{margin-left:.5rem;font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);}
+.code-body{padding:1.2rem 1.5rem;font-family:'JetBrains Mono',monospace;font-size:.75rem;line-height:1.8;color:var(--muted);}
+.kw{color:#7C3AED;}
+.fn{color:var(--blue);}
+.st{color:var(--green);}
+.cm{color:#475569;font-style:italic;}
+.num{color:var(--gold);}
+
+/* DS SKILLS */
+.ds-skills{display:flex;flex-direction:column;gap:1.2rem;}
+.ds-skill{
+  background:var(--card);border:1px solid var(--border);border-radius:6px;
+  padding:1rem 1.2rem;transition:all .3s;
+}
+.ds-skill:hover{border-color:rgba(59,130,246,.3);}
+.ds-skill-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;}
+.ds-skill-name{font-size:.85rem;font-weight:500;display:flex;align-items:center;gap:.6rem;}
+.ds-skill-pct{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--blue);}
+.ds-bar{height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;}
+.ds-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--green));width:0;transition:width 1.5s ease;}
+
+/* ═══════════════════════════════════════════════════════
+   PAGE 5: PROJECTS
+═══════════════════════════════════════════════════════ */
+.proj-hero{
+  background:linear-gradient(135deg,var(--navy2),var(--navy3));
+  border:1px solid var(--border);border-radius:12px;
+  padding:3rem;margin-bottom:3rem;position:relative;overflow:hidden;
+}
+.proj-hero::before{
+  content:'LIDSS';
+  position:absolute;right:-1rem;top:50%;transform:translateY(-50%);
+  font-family:'Playfair Display',serif;font-size:8rem;font-weight:700;
+  color:var(--blue);opacity:.04;letter-spacing:.1em;white-space:nowrap;
+}
+.proj-hero-badge{
+  font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--blue);
+  padding:.3rem .9rem;border:1px solid rgba(59,130,246,.3);border-radius:20px;
+  background:var(--blue-dim);display:inline-block;margin-bottom:1rem;
+}
+.proj-hero-title{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;margin-bottom:.6rem;}
+.proj-hero-org{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;}
+.proj-hero-desc{font-size:.9rem;color:var(--muted);line-height:1.8;max-width:700px;margin-bottom:2rem;}
+
+/* FLOW DIAGRAM */
+.flow-diagram{
+  display:flex;align-items:center;gap:0;overflow-x:auto;padding:1.5rem 0;
+  scrollbar-width:none;
+}
+.flow-diagram::-webkit-scrollbar{display:none;}
+.flow-node{
+  flex-shrink:0;
+  background:var(--navy2);border:1px solid var(--border);border-radius:8px;
+  padding:.8rem 1.2rem;text-align:center;min-width:130px;
+  transition:all .3s;
+}
+.flow-node:hover{border-color:var(--blue);box-shadow:0 0 15px var(--blue-dim);}
+.flow-node .fn-icon{font-size:1.3rem;display:block;margin-bottom:.3rem;}
+.flow-node .fn-label{font-size:.7rem;font-weight:500;color:var(--text);}
+.flow-node .fn-sub{font-size:.62rem;color:var(--muted);margin-top:.15rem;}
+.flow-arrow{
+  font-size:1.1rem;color:var(--blue);padding:0 .6rem;flex-shrink:0;
+  animation:arrowPulse 2s ease-in-out infinite;
+}
+@keyframes arrowPulse{0%,100%{opacity:.4;}50%{opacity:1;}}
+
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.5rem;}
+.proj-card{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:1.8rem;transition:all .35s;cursor:none;
+  position:relative;overflow:hidden;
+}
+.proj-card:hover{border-color:rgba(245,158,11,.3);transform:translateY(-5px);box-shadow:0 16px 40px rgba(0,0,0,.3);}
+.proj-num{
+  font-family:'Playfair Display',serif;font-size:4rem;font-weight:700;
+  color:var(--gold);opacity:.12;position:absolute;bottom:0;right:1rem;line-height:1;
+}
+.proj-period{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--gold);letter-spacing:.1em;margin-bottom:.6rem;}
+.proj-title{font-size:1.1rem;font-weight:600;margin-bottom:.3rem;line-height:1.4;}
+.proj-collab{font-size:.75rem;color:var(--muted);margin-bottom:1rem;font-style:italic;}
+.proj-desc{font-size:.82rem;color:var(--muted);line-height:1.7;}
+.proj-tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1.2rem;}
+
+/* ═══════════════════════════════════════════════════════
+   PAGE 6: PUBLICATIONS
+═══════════════════════════════════════════════════════ */
+.pub-library{display:flex;flex-direction:column;gap:1.5rem;}
+.pub-card{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:2rem 2.5rem;transition:all .35s;
+  display:grid;grid-template-columns:auto 1fr auto;gap:2rem;align-items:center;
+}
+.pub-card:hover{border-color:rgba(245,158,11,.3);transform:translateX(6px);}
+.pub-icon{
+  width:56px;height:56px;border-radius:8px;
+  background:var(--gold-dim);border:1px solid rgba(245,158,11,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;flex-shrink:0;
+}
+.pub-icon.blue-icon{background:var(--blue-dim);border-color:rgba(59,130,246,.2);}
+.pub-body{}
+.pub-type{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem;}
+.pub-type.blue{color:var(--blue);}
+.pub-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:600;line-height:1.4;margin-bottom:.4rem;}
+.pub-venue{font-size:.8rem;color:var(--muted);}
+.pub-link{
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--blue);border-bottom:1px solid rgba(59,130,246,.3);
+  padding-bottom:2px;transition:all .3s;white-space:nowrap;
+}
+.pub-link:hover{color:var(--gold);border-color:var(--gold);}
+
+/* ═══════════════════════════════════════════════════════
+   PAGE 7: RESEARCH FIELDWORK
+═══════════════════════════════════════════════════════ */
+.research-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;}
+.map-container{
+  background:var(--navy2);border:1px solid var(--border);border-radius:12px;
+  padding:2rem;position:relative;overflow:hidden;
+  min-height:420px;display:flex;flex-direction:column;
+}
+.map-title{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--blue);margin-bottom:1.5rem;}
+.meg-map{width:100%;height:300px;}
+.district{fill:rgba(59,130,246,.1);stroke:rgba(59,130,246,.3);stroke-width:1.5;cursor:none;transition:all .3s;}
+.district:hover,.district.active{fill:rgba(245,158,11,.2);stroke:var(--gold);stroke-width:2;}
+.district-label{font-family:'JetBrains Mono',monospace;font-size:7px;fill:var(--muted);pointer-events:none;}
+.map-pin{cursor:none;}
+.map-pin circle{fill:var(--gold);animation:pinPulse 2s infinite;}
+@keyframes pinPulse{0%,100%{r:5;opacity:1;}50%{r:8;opacity:.6;}}
+.district-info{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:1.2rem 1.5rem;margin-top:1rem;
+  font-size:.82rem;color:var(--muted);line-height:1.6;
+}
+.district-info .di-title{font-size:.9rem;font-weight:600;color:var(--text);margin-bottom:.4rem;font-family:'Playfair Display',serif;}
+.research-stats{display:flex;flex-direction:column;gap:1.2rem;}
+.rs-card{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:1.5rem;transition:all .3s;
+}
+.rs-card:hover{border-color:rgba(34,197,94,.3);}
+.rs-num{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:700;color:var(--green);line-height:1;}
+.rs-label{font-size:.78rem;color:var(--muted);margin-top:.2rem;}
+.rs-desc{font-size:.82rem;color:var(--muted);line-height:1.6;margin-top:1rem;}
+.research-findings{margin-top:3rem;}
+.finding-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:1.5rem;}
+.finding-card{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:1.5rem;transition:all .3s;
+}
+.finding-card:hover{border-color:rgba(34,197,94,.3);transform:translateY(-3px);}
+.fc-icon{font-size:1.5rem;margin-bottom:.8rem;display:block;}
+.fc-title{font-size:.88rem;font-weight:600;margin-bottom:.5rem;}
+.fc-desc{font-size:.78rem;color:var(--muted);line-height:1.6;}
+
+/* ═══════════════════════════════════════════════════════
+   PAGE 8: LEADERSHIP
+═══════════════════════════════════════════════════════ */
+.achievement-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;}
+.ach-card{
+  background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:1.8rem;transition:all .35s;text-align:center;
+  position:relative;overflow:hidden;
+}
+.ach-card::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at center,var(--gold-dim),transparent 70%);
+  opacity:0;transition:opacity .4s;
+}
+.ach-card:hover::after{opacity:1;}
+.ach-card:hover{border-color:rgba(245,158,11,.35);transform:translateY(-5px);box-shadow:0 0 30px rgba(245,158,11,.1);}
+.ach-badge{
+  width:70px;height:70px;border-radius:50%;
+  background:var(--gold-dim);border:2px solid rgba(245,158,11,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;margin:0 auto 1.2rem;
+  transition:all .3s;position:relative;z-index:1;
+}
+.ach-card:hover .ach-badge{border-color:var(--gold);box-shadow:0 0 20px var(--gold-glow);}
+.ach-badge.blue{background:var(--blue-dim);border-color:rgba(59,130,246,.3);}
+.ach-card:hover .ach-badge.blue{border-color:var(--blue);box-shadow:0 0 20px var(--blue-glow);}
+.ach-title{font-size:.95rem;font-weight:600;margin-bottom:.3rem;position:relative;z-index:1;}
+.ach-org{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.6rem;position:relative;z-index:1;}
+.ach-desc{font-size:.78rem;color:var(--muted);line-height:1.6;position:relative;z-index:1;}
+.leadership-positions{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem;margin-top:3rem;}
+.lp-card{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:1.5rem;display:flex;align-items:center;gap:1.2rem;transition:all .3s;
+  border-left:3px solid var(--blue);
+}
+.lp-card:hover{background:rgba(59,130,246,.05);border-left-color:var(--gold);}
+.lp-icon{font-size:1.5rem;flex-shrink:0;}
+.lp-role{font-size:.95rem;font-weight:600;margin-bottom:.15rem;}
+.lp-org{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--blue);letter-spacing:.08em;text-transform:uppercase;}
+
+/* ═══════════════════════════════════════════════════════
+   PAGE 9: LEGAL TECH LAB
+═══════════════════════════════════════════════════════ */
+.lab-header{
+  background:linear-gradient(135deg,var(--navy2),var(--navy3));
+  border:1px solid var(--border);border-radius:12px;padding:2.5rem;margin-bottom:3rem;
+  text-align:center;position:relative;overflow:hidden;
+}
+.lab-header::before{
+  content:'LAB';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  font-family:'Playfair Display',serif;font-size:12rem;font-weight:700;
+  color:var(--blue);opacity:.025;pointer-events:none;letter-spacing:.2em;
+}
+.lab-badge{
+  font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.35em;
+  text-transform:uppercase;color:var(--green);padding:.3rem .9rem;
+  border:1px solid rgba(34,197,94,.3);border-radius:20px;background:var(--green-dim);
+  display:inline-block;margin-bottom:1rem;
+}
+.lab-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;margin-bottom:.6rem;}
+.lab-sub{font-size:.88rem;color:var(--muted);}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:2rem;}
+.tool-card{
+  background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;
+  transition:all .35s;
+}
+.tool-card:hover{border-color:rgba(34,197,94,.3);box-shadow:0 8px 32px rgba(0,0,0,.3);}
+.tool-header{
+  background:rgba(255,255,255,.03);border-bottom:1px solid var(--border);
+  padding:1.2rem 1.5rem;display:flex;align-items:center;gap:.8rem;
+}
+.tool-num{
+  width:32px;height:32px;border-radius:6px;background:var(--green-dim);
+  border:1px solid rgba(34,197,94,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--green);font-weight:500;
+}
+.tool-name{font-size:.9rem;font-weight:600;}
+.tool-tag{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--green);background:var(--green-dim);padding:.2rem .6rem;border-radius:3px;}
+.tool-tag.ai-tag{color:var(--blue);background:var(--blue-dim);}
+.tool-body{padding:1.5rem;}
+.tool-desc{font-size:.82rem;color:var(--muted);line-height:1.6;margin-bottom:1.2rem;}
+.lab-textarea{
+  width:100%;background:var(--navy2);border:1px solid var(--border);border-radius:6px;
+  padding:.8rem 1rem;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.75rem;
+  resize:vertical;min-height:100px;outline:none;transition:border-color .3s;
+}
+.lab-textarea:focus{border-color:rgba(34,197,94,.4);}
+.lab-btn{
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.18em;
+  text-transform:uppercase;padding:.6rem 1.4rem;
+  background:var(--green-dim);color:var(--green);border:1px solid rgba(34,197,94,.3);
+  border-radius:4px;cursor:none;transition:all .3s;margin-top:.8rem;
+}
+.lab-btn:hover{background:rgba(34,197,94,.2);box-shadow:0 0 15px rgba(34,197,94,.2);}
+.lab-btn.ai-btn{background:var(--blue-dim);color:var(--blue);border-color:rgba(59,130,246,.3);}
+.lab-btn.ai-btn:hover{background:rgba(59,130,246,.25);box-shadow:0 0 15px var(--blue-glow);}
+.lab-result{margin-top:1rem;min-height:40px;}
+.keyword-highlight{
+  background:rgba(245,158,11,.15);color:var(--gold);border-bottom:1px solid var(--gold);
+  border-radius:2px;padding:0 2px;font-weight:500;
+}
+.analyzer-results{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-top:1rem;}
+.ar-item{
+  background:var(--navy2);border:1px solid var(--border);border-radius:6px;
+  padding:.8rem;text-align:center;
+}
+.ar-val{font-family:'JetBrains Mono',monospace;font-size:1.2rem;color:var(--blue);font-weight:500;}
+.ar-key{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:.2rem;}
+.chart-container{height:160px;position:relative;margin-top:.8rem;}
+
+/* ── JUDGMENT SUMMARIZER ── */
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:1rem;}
+.summary-card{
+  background:var(--navy2);border:1px solid var(--border);border-radius:8px;
+  padding:1rem;transition:all .3s;opacity:0;transform:translateY(8px);
+}
+.summary-card.revealed{opacity:1;transform:translateY(0);transition:opacity .4s ease,transform .4s ease;}
+.summary-card-label{
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.2em;
+  text-transform:uppercase;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem;
+}
+.summary-card-label.facts{color:var(--blue);}
+.summary-card-label.issues{color:var(--gold);}
+.summary-card-label.args{color:#A78BFA;}
+.summary-card-label.judgment{color:var(--green);}
+.summary-card-content{font-size:.78rem;color:var(--muted);line-height:1.7;}
+.ai-loading{
+  display:flex;align-items:center;gap:.6rem;
+  font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--blue);
+  padding:.8rem 0;
+}
+.ai-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);animation:aiPulse 1.2s ease-in-out infinite;}
+.ai-dot:nth-child(2){animation-delay:.2s;}
+.ai-dot:nth-child(3){animation-delay:.4s;}
+@keyframes aiPulse{0%,100%{transform:scale(1);opacity:.5;}50%{transform:scale(1.4);opacity:1;}}
+
+/* ── COURTROOM SIMULATOR ── */
+.courtroom-header{
+  background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(15,23,42,0));
+  border:1px solid rgba(245,158,11,.15);border-radius:10px;
+  padding:1.5rem;margin-bottom:2rem;text-align:center;
+}
+.courtroom-icon{font-size:3rem;display:block;margin-bottom:.5rem;}
+.courtroom-output{display:flex;flex-direction:column;gap:.8rem;margin-top:1rem;}
+.court-section{
+  background:var(--navy2);border:1px solid var(--border);border-radius:8px;
+  padding:1rem 1.2rem;opacity:0;transform:translateX(-8px);
+}
+.court-section.in{opacity:1;transform:translateX(0);transition:all .4s ease;}
+.court-section-header{
+  display:flex;align-items:center;gap:.6rem;
+  font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.2em;
+  text-transform:uppercase;margin-bottom:.5rem;
+}
+.court-section-body{font-size:.8rem;color:var(--muted);line-height:1.7;}
+.risk-bar{
+  height:6px;background:rgba(255,255,255,.05);border-radius:3px;
+  overflow:hidden;margin-top:.5rem;
+}
+.risk-fill{height:100%;border-radius:3px;transition:width 1s ease;}
+
+/* ── KNOWLEDGE GRAPH ── */
+.kg-wrap{
+  background:var(--navy2);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;position:relative;
+}
+.kg-toolbar{
+  background:rgba(255,255,255,.03);border-bottom:1px solid var(--border);
+  padding:.8rem 1.2rem;display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;
+}
+.kg-title{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--blue);}
+.kg-legend{display:flex;gap:1rem;margin-left:auto;flex-wrap:wrap;}
+.kg-legend-item{display:flex;align-items:center;gap:.4rem;font-size:.65rem;color:var(--muted);}
+.kg-dot{width:8px;height:8px;border-radius:50%;}
+#knowledge-graph{width:100%;height:420px;}
+.kg-tooltip{
+  position:absolute;background:var(--navy3);border:1px solid var(--border);
+  border-radius:6px;padding:.6rem .9rem;font-size:.75rem;color:var(--text);
+  pointer-events:none;opacity:0;transition:opacity .2s;z-index:10;
+  max-width:200px;line-height:1.5;
+}
+
+/* ── COURTROOM SIMULATOR FULL PAGE ── */
+#page-courtroom{background:radial-gradient(ellipse 60% 50% at 50% 30%,rgba(245,158,11,.05) 0%,transparent 60%);}
+
+/* ═══════════════════════════════════════════════════════
+   PAGE 10: CONTACT
+═══════════════════════════════════════════════════════ */
+.contact-wrap{max-width:900px;margin:0 auto;}
+.contact-header{text-align:center;margin-bottom:4rem;}
+.legal-seal{
+  width:120px;height:120px;border-radius:50%;
+  border:2px solid var(--gold);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  margin:0 auto 2rem;
+  position:relative;
+  animation:rotateSeal 20s linear infinite;
+  background:var(--gold-dim);
+}
+@keyframes rotateSeal{to{transform:rotate(360deg);}}
+.seal-inner{animation:rotateSeal 20s linear infinite reverse;}
+.seal-icon{font-size:2.5rem;display:block;}
+.seal-text{
+  font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--gold);margin-top:.3rem;
+}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;}
+.contact-links{display:flex;flex-direction:column;gap:1rem;margin-top:1.5rem;}
+.c-link{
+  display:flex;align-items:center;gap:1rem;padding:1rem 1.5rem;
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  transition:all .3s;cursor:none;text-decoration:none;color:inherit;
+}
+.c-link:hover{border-color:rgba(59,130,246,.3);transform:translateX(5px);}
+.c-link-icon{
+  width:38px;height:38px;border-radius:6px;background:var(--blue-dim);
+  border:1px solid rgba(59,130,246,.2);
+  display:flex;align-items:center;justify-content:center;font-size:1rem;
+  flex-shrink:0;transition:all .3s;
+}
+.c-link:hover .c-link-icon{background:var(--blue);border-color:var(--blue);}
+.c-link-lbl{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);display:block;}
+.c-link-val{font-size:.88rem;color:var(--text);}
+.contact-form{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:2rem;}
+.cf-group{margin-bottom:1.2rem;}
+.cf-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.5rem;}
+.cf-input,.cf-textarea{
+  width:100%;background:var(--navy2);border:1px solid var(--border);border-radius:6px;
+  padding:.75rem 1rem;color:var(--text);font-family:'Poppins',sans-serif;font-size:.85rem;
+  outline:none;transition:border-color .3s;
+}
+.cf-input:focus,.cf-textarea:focus{border-color:rgba(59,130,246,.4);}
+.cf-textarea{height:100px;resize:none;}
+.cf-submit{
+  width:100%;padding:.85rem;background:var(--blue);color:#fff;border:none;border-radius:6px;
+  font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;
+  cursor:none;transition:all .3s;font-weight:500;
+}
+.cf-submit:hover{background:#2563EB;box-shadow:0 0 25px var(--blue-glow);}
+#cf-status{font-size:.8rem;text-align:center;margin-top:.8rem;min-height:1rem;}
+
+/* ═══════════════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════════════ */
+footer{
+  text-align:center;padding:2rem;border-top:1px solid var(--border);
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);
+  letter-spacing:.1em;position:relative;z-index:10;
+}
+footer span{color:var(--gold);}
+
+/* ═══════════════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.anim-fade-up{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;}
+.anim-fade-up.in{opacity:1;transform:translateY(0);}
+
+/* ═══════════════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════════════ */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--navy);}
+::-webkit-scrollbar-thumb{background:var(--navy3);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--blue);}
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════ */
+@media(max-width:900px){
+  nav{padding:.9rem 1.5rem;}
+  .nav-links,.nav-cta,.nav-linkedin{display:none;}
+  .hamburger{display:flex;}
+  .metrics-strip{grid-template-columns:repeat(2,1fr);}
+  .about-grid,.ds-grid,.research-grid,.contact-grid{grid-template-columns:1fr;}
+  .leadership-positions{grid-template-columns:1fr;}
+  .finding-cards{grid-template-columns:1fr;}
+  .pub-card{grid-template-columns:auto 1fr;grid-template-rows:auto auto;}
+  .pub-link{grid-column:1/-1;}
+  .tech-orbit{max-width:320px;margin:0 auto;}
+  .summary-grid{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  .hero-name{font-size:2.5rem;}
+  .metrics-strip{grid-template-columns:1fr 1fr;}
+  .exp-grid,.achievement-grid,.tools-grid,.proj-grid{grid-template-columns:1fr;}
+  .section{padding:3rem 0;}
+  .container{padding:0 1.2rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="cur-dot" id="curDot"></div>
+<div class="cur-ring" id="curRing"></div>
+<canvas id="bg-canvas"></canvas>
+
+<!-- ═══════════ NAVIGATION ═══════════ -->
+<nav id="main-nav">
+  <div class="nav-logo">⚖️ <span>SU</span> · Legal Intelligence</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#" onclick="showPage('home')" data-page="home" class="active">Home</a></li>
+    <li><a href="#" onclick="showPage('about')" data-page="about">About</a></li>
+    <li><a href="#" onclick="showPage('legal')" data-page="legal">Experience</a></li>
+    <li><a href="#" onclick="showPage('data')" data-page="data">Data Science</a></li>
+    <li><a href="#" onclick="showPage('projects')" data-page="projects">Projects</a></li>
+    <li><a href="#" onclick="showPage('publications')" data-page="publications">Publications</a></li>
+    <li><a href="#" onclick="showPage('research')" data-page="research">Research</a></li>
+    <li><a href="#" onclick="showPage('leadership')" data-page="leadership">Leadership</a></li>
+    <li><a href="#" onclick="showPage('lab')" data-page="lab">Lab</a></li>
+    <li><a href="#" onclick="showPage('contact')" data-page="contact">Contact</a></li>
+  </ul>
+  <a href="https://www.linkedin.com/in/shreyansh-upadhyay-5708aa216/" target="_blank" class="nav-linkedin" title="LinkedIn">in</a>
+  <button class="nav-cta btn" onclick="showPage('lab')">Enter Lab →</button>
+  <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#" onclick="showPage('home');toggleMobileMenu()">Home</a>
+  <a href="#" onclick="showPage('about');toggleMobileMenu()">About</a>
+  <a href="#" onclick="showPage('legal');toggleMobileMenu()">Legal Experience</a>
+  <a href="#" onclick="showPage('data');toggleMobileMenu()">Data Science</a>
+  <a href="#" onclick="showPage('projects');toggleMobileMenu()">Projects</a>
+  <a href="#" onclick="showPage('publications');toggleMobileMenu()">Publications</a>
+  <a href="#" onclick="showPage('research');toggleMobileMenu()">Research</a>
+  <a href="#" onclick="showPage('leadership');toggleMobileMenu()">Leadership</a>
+  <a href="#" onclick="showPage('lab');toggleMobileMenu()">Legal Tech Lab</a>
+  <a href="#" onclick="showPage('contact');toggleMobileMenu()">Contact</a>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE: HOME ═══ -->
+<div id="page-home" class="page active">
+  <section id="home" style="min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:5rem;">
+    <div class="container" style="text-align:center;">
+      <div class="hero-badge"><span class="dot"></span> Available for Internships & Research</div>
+      <h1 class="hero-name">
+        <span class="line1">Shreyansh</span>
+        <span class="line2">Upadhyay</span>
+      </h1>
+      <div class="hero-roles">
+        <span class="hero-role-tag tag-law">⚖️ Law</span>
+        <span class="hero-role-tag tag-data">📊 Data Science</span>
+        <span class="hero-role-tag tag-tech">🤖 Legal Technology</span>
+      </div>
+      <p class="hero-tagline">
+        <strong>"Building Intelligence at the Intersection of Law and Algorithms"</strong><br>
+        B.S. LL.B. · National Law University Meghalaya · Data Science Specialisation
+      </p>
+      <div class="hero-btns">
+        <button class="btn btn-primary" onclick="showPage('projects')">🔬 Explore Work</button>
+        <button class="btn btn-outline-gold" onclick="showPage('lab')">⚗️ Enter Legal Tech Lab</button>
+        <button class="btn btn-outline" onclick="showPage('publications')">📜 View Publications</button>
+      </div>
+      <div class="metrics-strip" style="margin-top:4rem;">
+        <div class="metric-card anim-fade-up"><span class="metric-num" data-target="9">0</span><div class="metric-label">Internships Completed</div></div>
+        <div class="metric-card anim-fade-up"><span class="metric-num gold" data-target="3">0</span><div class="metric-label">Publications</div></div>
+        <div class="metric-card anim-fade-up"><span class="metric-num green" data-target="2">0</span><div class="metric-label">Research Projects</div></div>
+        <div class="metric-card anim-fade-up"><span class="metric-num" style="color:#A78BFA" data-target="4">0</span><div class="metric-label">Leadership Positions</div></div>
+      </div>
+    </div>
+  </section>
+  <footer>© 2025 <span>Shreyansh Upadhyay</span> · B.S. LL.B. · National Law University Meghalaya</footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE: ABOUT ═══ -->
+<div id="page-about" class="page">
+  <section class="section">
+    <div class="container">
+      <div class="section-label">02 · About Me</div>
+      <div class="about-grid">
+        <div>
+          <div class="about-photo-wrap">
+           <div class="about-initials">
+  <img src="images/profile.jpg" alt="Shreyansh Upadhyay" 
+       style="width:100%; height:100%; object-fit:cover; border-radius:4px;">
+</div>
+            </div>
+          </div>
+          <!-- RADAR CHART -->
+          <div class="radar-wrap" style="margin-top:2rem;">
+            <div class="radar-title">📊 Competency Radar</div>
+            <canvas id="radarChart" height="240"></canvas>
+          </div>
+          <div style="margin-top:2rem;">
+            <div class="section-label" style="margin-bottom:1rem;">Career Timeline</div>
+            <div class="timeline">
+              <div class="tl-item blue-dot anim-fade-up"><div class="tl-year">2023</div><div class="tl-title">Enrolled — B.S. LL.B. (Data Science)</div><div class="tl-sub">National Law University Meghalaya</div></div>
+              <div class="tl-item green-dot anim-fade-up"><div class="tl-year">Jan 2024</div><div class="tl-title">RTI & Legal Drafting Internship</div><div class="tl-sub">MP State Information Commission</div></div>
+              <div class="tl-item gold-dot anim-fade-up"><div class="tl-year">Jun 2024</div><div class="tl-title">AI / Machine Learning Training</div><div class="tl-sub">NIELIT, Shillong — Python, AI, ML</div></div>
+              <div class="tl-item blue-dot anim-fade-up"><div class="tl-year">Aug 2024</div><div class="tl-title">Legal AI Research — LIDSS Project</div><div class="tl-sub">IIT Kharagpur × NLU Meghalaya</div></div>
+              <div class="tl-item gold-dot anim-fade-up"><div class="tl-year">Feb 2025</div><div class="tl-title">Judicial Internship</div><div class="tl-sub">High Court of Meghalaya</div></div>
+              <div class="tl-item green-dot anim-fade-up"><div class="tl-year">Jan 2026</div><div class="tl-title">Litigation Internship — New Delhi</div><div class="tl-sub">Shri Nakoda and Company</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="about-right">
+          <div class="section-label">Who I Am</div>
+          <h2 class="section-title">Law Meets <span class="blue">Algorithms</span></h2>
+          <p class="about-bio" style="margin-top:1rem;">I am a <strong>B.S. LL.B. student at National Law University Meghalaya</strong>, working at the intersection of legal scholarship and data intelligence. With a specialisation in <strong>Data Science</strong>, I blend rigorous legal research with computational thinking.</p>
+          <p class="about-bio">My work spans <strong>AI-assisted legal research</strong>, corporate governance, insolvency law, human rights, and policy analysis. I've contributed to an <strong>AI project with IIT Kharagpur</strong> building legal intelligence systems, and conducted field research in Meghalaya.</p>
+          <p class="about-bio">I believe the future of justice is data-informed, and I'm building the skills to be at the forefront of that transformation.</p>
+          <div class="divider" style="margin:2rem 0;"></div>
+          <div class="section-label">Core Competencies</div>
+          <div class="skill-bars" id="skillBars">
+            <div class="skill-bar-item"><div class="skill-bar-header"><span class="skill-bar-name"><span class="dot" style="background:var(--gold)"></span>Legal Research & Analysis</span><span class="skill-bar-pct">92%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" style="background:var(--gold);" data-w="92"></div></div></div>
+            <div class="skill-bar-item"><div class="skill-bar-header"><span class="skill-bar-name"><span class="dot" style="background:var(--gold)"></span>Legal Drafting</span><span class="skill-bar-pct">88%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" style="background:var(--gold);" data-w="88"></div></div></div>
+            <div class="skill-bar-item"><div class="skill-bar-header"><span class="skill-bar-name"><span class="dot" style="background:var(--blue)"></span>Python & Data Science</span><span class="skill-bar-pct">72%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" style="background:var(--blue);" data-w="72"></div></div></div>
+            <div class="skill-bar-item"><div class="skill-bar-header"><span class="skill-bar-name"><span class="dot" style="background:var(--blue)"></span>Machine Learning</span><span class="skill-bar-pct">65%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" style="background:var(--blue);" data-w="65"></div></div></div>
+            <div class="skill-bar-item"><div class="skill-bar-header"><span class="skill-bar-name"><span class="dot" style="background:var(--green)"></span>Policy Analysis</span><span class="skill-bar-pct">85%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" style="background:var(--green);" data-w="85"></div></div></div>
+            <div class="skill-bar-item"><div class="skill-bar-header"><span class="skill-bar-name"><span class="dot" style="background:var(--green)"></span>Public Speaking & Mooting</span><span class="skill-bar-pct">90%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" style="background:var(--green);" data-w="90"></div></div></div>
+          </div>
+          <!-- LinkedIn in About -->
+          <div style="margin-top:2rem;">
+            <a href="https://www.linkedin.com/in/shreyansh-upadhyay-5708aa216/" target="_blank" class="c-link" style="display:inline-flex;max-width:260px;">
+              <div class="c-link-icon" style="background:rgba(10,102,194,.2);border-color:rgba(10,102,194,.4);">in</div>
+              <div><span class="c-link-lbl">Connect on</span><span class="c-link-val">LinkedIn</span></div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer>© 2025 <span>Shreyansh Upadhyay</span> · B.S. LL.B. · National Law University Meghalaya</footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE: LEGAL EXPERIENCE ═══ -->
+<div id="page-legal" class="page">
+  <section class="section">
+    <div class="container">
+      <div class="section-label">03 · Legal Experience</div>
+      <h2 class="section-title">Where <span class="gold">Law</span> Was Practiced</h2>
+      <p class="section-sub" style="margin-bottom:3rem;">Nine internships across litigation, judiciary, human rights, regulatory, and corporate law — each shaping a multi-dimensional legal perspective.</p>
+      <div class="exp-grid">
+        <div class="exp-card anim-fade-up"><div class="exp-type">Law Firm · Litigation</div><div class="exp-org">Shri Nakoda and Company</div><div class="exp-date-loc"><span>📅 January 2026</span><span>📍 New Delhi</span></div><ul class="exp-bullets"><li>Drafted legal notices, affidavits, writ petitions and pleadings</li><li>Comprehensive case law research and judgment analysis</li><li>End-to-end documentation and e-filing processes</li><li>Regulatory, consumer, civil & administrative law matters</li></ul><div class="exp-tags"><span class="exp-tag">Litigation</span><span class="exp-tag">Drafting</span><span class="exp-tag gold">Civil Law</span></div></div>
+        <div class="exp-card anim-fade-up"><div class="exp-type">Law Firm · Corporate</div><div class="exp-org">Agrawal et al</div><div class="exp-date-loc"><span>📅 June 2025</span><span>📍 Kolkata</span></div><ul class="exp-bullets"><li>Drafted NDAs, offer letters, retainer agreements</li><li>Case briefs on Insolvency & Bankruptcy Code, 2016</li><li>Consumer protection, dark patterns, RERA research</li><li>Supporting notes for active corporate matters</li></ul><div class="exp-tags"><span class="exp-tag">IBC 2016</span><span class="exp-tag gold">Corporate</span><span class="exp-tag green">RERA</span></div></div>
+        <div class="exp-card anim-fade-up"><div class="exp-type">Judiciary</div><div class="exp-org">High Court of Meghalaya</div><div class="exp-date-loc"><span>📅 Feb 2025</span><span>📍 Shillong</span></div><ul class="exp-bullets"><li>Observed court proceedings under Justice Wanlura Diengdoh</li><li>Case notes on arguments, legal issues & judgments</li><li>Researched precedents, statutory provisions, case laws</li></ul><div class="exp-tags"><span class="exp-tag">Judiciary</span><span class="exp-tag gold">High Court</span></div></div>
+        <div class="exp-card anim-fade-up"><div class="exp-type">Judiciary · Rajasthan</div><div class="exp-org">High Court of Rajasthan, Jodhpur Bench</div><div class="exp-date-loc"><span>📅 Jan 2025</span><span>📍 Jodhpur</span></div><ul class="exp-bullets"><li>Observed Jodhpur Bench & District Court proceedings</li><li>Assisted in writ petitions, legal notices, case submissions</li><li>Research on CrPC, CPC & statutory provisions</li></ul><div class="exp-tags"><span class="exp-tag">CrPC</span><span class="exp-tag">CPC</span><span class="exp-tag gold">High Court</span></div></div>
+        <div class="exp-card anim-fade-up"><div class="exp-type">Technology · Data Science</div><div class="exp-org">NIELIT — National Institute of Electronics & IT</div><div class="exp-date-loc"><span>📅 June 2024</span><span>📍 Shillong</span></div><ul class="exp-bullets"><li>Applied Python programming in legal data contexts</li><li>Hands-on AI and Machine Learning experience</li><li>Developed and implemented ML algorithms</li><li>Practical AI/ML projects for real-world applications</li></ul><div class="exp-tags"><span class="exp-tag">Python</span><span class="exp-tag">AI/ML</span><span class="exp-tag green">Data Science</span></div></div>
+        <div class="exp-card anim-fade-up"><div class="exp-type">Content & Mentorship</div><div class="exp-org">Mentblue</div><div class="exp-date-loc"><span>📅 Aug 2024 – Present</span><span>📍 Hybrid</span></div><ul class="exp-bullets"><li>Drafted Community Guidelines for Mentorship (global standards)</li><li>Curated news posts for community engagement</li><li>Authored articles on Supreme Court judgments</li></ul><div class="exp-tags"><span class="exp-tag">Writing</span><span class="exp-tag green">Legal Journalism</span></div></div>
+        <div class="exp-card anim-fade-up"><div class="exp-type">Legal Research</div><div class="exp-org">World Development Corporation</div><div class="exp-date-loc"><span>📅 May–Sep 2024</span><span>📍 Hybrid</span></div><ul class="exp-bullets"><li>In-depth legal research on Supreme Court Cases</li><li>Assisted in drafting and reviewing legal documents</li><li>Administrative support to the legal team</li></ul><div class="exp-tags"><span class="exp-tag">Research</span><span class="exp-tag gold">Drafting</span></div></div>
+        <div class="exp-card anim-fade-up"><div class="exp-type">Human Rights</div><div class="exp-org">Meghalaya Human Rights Commission</div><div class="exp-date-loc"><span>📅 Feb 2024</span><span>📍 Shillong</span></div><ul class="exp-bullets"><li>Extensive research on human rights issues and laws</li><li>Analysed case files, complaints & violation reports</li></ul><div class="exp-tags"><span class="exp-tag green">Human Rights</span><span class="exp-tag">Research</span></div></div>
+        <div class="exp-card anim-fade-up"><div class="exp-type">Government · RTI</div><div class="exp-org">MP State Information Commission</div><div class="exp-date-loc"><span>📅 Jan 2024</span><span>📍 Bhopal</span></div><ul class="exp-bullets"><li>Drafted petitions, notices & Commission orders</li><li>Attended hearings and client meetings</li><li>Practical experience implementing RTI Act 2005</li></ul><div class="exp-tags"><span class="exp-tag">RTI Act</span><span class="exp-tag gold">Government</span></div></div>
+      </div>
+    </div>
+  </section>
+  <footer>© 2025 <span>Shreyansh Upadhyay</span> · B.S. LL.B. · National Law University Meghalaya</footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE: DATA SCIENCE ═══ -->
+<div id="page-data" class="page">
+  <section class="section">
+    <div class="container">
+      <div class="section-label">04 · Data Science & Technology</div>
+      <h2 class="section-title">Code Meets <span class="blue">Courtroom</span></h2>
+      <p class="section-sub" style="margin-bottom:3rem;">Applying computational thinking to legal problems — from NLP-powered case analysis to ML-assisted legal research systems.</p>
+      <div class="ds-grid">
+        <div>
+          <div class="tech-orbit" style="max-width:380px;margin:0 auto;">
+            <div class="orbit-ring ring3"><div class="orbit-node n3-1">🤖</div><div class="orbit-node n3-2">📋</div><div class="orbit-node n3-3">📊</div><div class="orbit-node n3-4">⚖️</div></div>
+            <div class="orbit-ring ring2"><div class="orbit-node n2-1">🔤</div><div class="orbit-node n2-2">🧠</div><div class="orbit-node n2-3">🗄️</div><div class="orbit-node n2-4">🔗</div></div>
+            <div class="orbit-ring ring1"><div class="orbit-node n1-1">🐍</div><div class="orbit-node n1-2">📐</div></div>
+            <div class="orbit-center"><span class="oc-icon">⚖️</span><span class="oc-label">Legal AI</span></div>
+          </div>
+          <div class="code-block" style="margin-top:2rem;">
+            <div class="code-header"><div class="code-dot" style="background:#FF5F57;"></div><div class="code-dot" style="background:#FEBC2E;"></div><div class="code-dot" style="background:#28C840;"></div><span class="code-title">legal_classifier.py</span></div>
+            <div class="code-body">
+<span class="cm"># Legal Case Category Classifier</span><br>
+<span class="kw">import</span> <span class="fn">pandas</span> <span class="kw">as</span> pd<br>
+<span class="kw">from</span> <span class="fn">sklearn.pipeline</span> <span class="kw">import</span> Pipeline<br>
+<span class="kw">from</span> <span class="fn">sklearn.svm</span> <span class="kw">import</span> LinearSVC<br><br>
+<span class="kw">def</span> <span class="fn">classify_legal_text</span>(text):<br>
+&nbsp;&nbsp;<span class="cm">"""Classify judgment into legal category"""</span><br>
+&nbsp;&nbsp;categories = [<span class="st">'Constitutional'</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="st">'Criminal'</span>, <span class="st">'Civil'</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="st">'Corporate'</span>, <span class="st">'Family'</span>]<br>
+&nbsp;&nbsp;confidence = model.predict_proba([text])<br>
+&nbsp;&nbsp;<span class="kw">return</span> {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="st">'category'</span>: categories[confidence.argmax()],<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="st">'score'</span>: <span class="num">round</span>(confidence.max(), <span class="num">3</span>)<br>
+&nbsp;&nbsp;}
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="section-label">Technical Proficiency</div>
+          <div class="ds-skills" id="dsSkills">
+            <div class="ds-skill"><div class="ds-skill-top"><span class="ds-skill-name">🐍 Python Programming</span><span class="ds-skill-pct">72%</span></div><div class="ds-bar"><div class="ds-fill" data-w="72"></div></div></div>
+            <div class="ds-skill"><div class="ds-skill-top"><span class="ds-skill-name">🧠 Machine Learning</span><span class="ds-skill-pct">65%</span></div><div class="ds-bar"><div class="ds-fill" data-w="65"></div></div></div>
+            <div class="ds-skill"><div class="ds-skill-top"><span class="ds-skill-name">🤖 Artificial Intelligence</span><span class="ds-skill-pct">60%</span></div><div class="ds-bar"><div class="ds-fill" data-w="60"></div></div></div>
+            <div class="ds-skill"><div class="ds-skill-top"><span class="ds-skill-name">🔤 NLP (Legal Text)</span><span class="ds-skill-pct">68%</span></div><div class="ds-bar"><div class="ds-fill" data-w="68"></div></div></div>
+            <div class="ds-skill"><div class="ds-skill-top"><span class="ds-skill-name">📊 Legal Data Structuring</span><span class="ds-skill-pct">80%</span></div><div class="ds-bar"><div class="ds-fill" data-w="80"></div></div></div>
+            <div class="ds-skill"><div class="ds-skill-top"><span class="ds-skill-name">📈 Data Visualization</span><span class="ds-skill-pct">62%</span></div><div class="ds-bar"><div class="ds-fill" data-w="62"></div></div></div>
+            <div class="ds-skill"><div class="ds-skill-top"><span class="ds-skill-name">🗄️ Legal Databases (Manupatra, SCC)</span><span class="ds-skill-pct">88%</span></div><div class="ds-bar"><div class="ds-fill" data-w="88"></div></div></div>
+          </div>
+          <div class="scale-divider" style="margin-top:2.5rem;">AI × LAW INTERSECTION</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="glass" style="padding:1.2rem;border-radius:8px;text-align:center;"><div style="font-size:1.8rem;margin-bottom:.5rem;">🏛️</div><div style="font-size:.8rem;font-weight:600;margin-bottom:.3rem;">Legal NLP</div><div style="font-size:.72rem;color:var(--muted);">Extracting legal principles from judgment text</div></div>
+            <div class="glass" style="padding:1.2rem;border-radius:8px;text-align:center;"><div style="font-size:1.8rem;margin-bottom:.5rem;">⚖️</div><div style="font-size:.8rem;font-weight:600;margin-bottom:.3rem;">Case Prediction</div><div style="font-size:.72rem;color:var(--muted);">ML models for legal outcome analysis</div></div>
+            <div class="glass" style="padding:1.2rem;border-radius:8px;text-align:center;"><div style="font-size:1.8rem;margin-bottom:.5rem;">📜</div><div style="font-size:.8rem;font-weight:600;margin-bottom:.3rem;">Policy Analytics</div><div style="font-size:.72rem;color:var(--muted);">Data-driven policy impact assessment</div></div>
+            <div class="glass" style="padding:1.2rem;border-radius:8px;text-align:center;"><div style="font-size:1.8rem;margin-bottom:.5rem;">🔍</div><div style="font-size:.8rem;font-weight:600;margin-bottom:.3rem;">Smart Research</div><div style="font-size:.72rem;color:var(--muted);">AI-enhanced legal research workflows</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer>© 2025 <span>Shreyansh Upadhyay</span> · B.S. LL.B. · National Law University Meghalaya</footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE: PROJECTS ═══ -->
+<div id="page-projects" class="page">
+  <section class="section">
+    <div class="container">
+      <div class="section-label">05 · Projects</div>
+      <h2 class="section-title">Research <span class="blue">Intelligence</span></h2>
+      <p class="section-sub" style="margin-bottom:2.5rem;">Interdisciplinary projects at the frontier of legal AI and social justice research.</p>
+      <div class="proj-hero anim-fade-up">
+        <div class="proj-hero-badge">⭐ Featured Project</div>
+        <div class="proj-hero-title">Legal Intelligence and Decision Support System</div>
+        <div class="proj-hero-org">IIT Kharagpur × NLU Meghalaya · November 2024 – Present</div>
+        <div class="proj-hero-desc">Building an AI-powered legal research system using Supreme Court and High Court judgments. The system structures legal text for NLP model training, extracts legal principles, and assists lawyers with intelligent decision support.</div>
+        <div class="flow-diagram">
+          <div class="flow-node"><span class="fn-icon">📄</span><span class="fn-label">Judgment</span><span class="fn-sub">SC/HC Texts</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><span class="fn-icon">🔤</span><span class="fn-label">NLP Pipeline</span><span class="fn-sub">Tokenization</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><span class="fn-icon">🗄️</span><span class="fn-label">Data Structure</span><span class="fn-sub">Legal Corpus</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><span class="fn-icon">🧠</span><span class="fn-label">ML Training</span><span class="fn-sub">Classification</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><span class="fn-icon">⚖️</span><span class="fn-label">Legal Insights</span><span class="fn-sub">LIDSS Output</span></div>
+        </div>
+        <div class="exp-tags" style="margin-top:1rem;"><span class="exp-tag">AI / NLP</span><span class="exp-tag">Legal Research</span><span class="exp-tag gold">IIT Kharagpur</span><span class="exp-tag green">Active</span></div>
+      </div>
+      <div class="proj-grid">
+        <div class="proj-card anim-fade-up">
+          <div class="proj-num">02</div>
+          <div class="proj-period">August 2024 – March 2025</div>
+          <div class="proj-title">Domestic Violence in a Matrilineal Context: Tribal Women in Meghalaya</div>
+          <div class="proj-collab">WBNUJS × NLU Meghalaya</div>
+          <div class="proj-desc">Field research investigating domestic violence experiences of tribal women in matrilineal Meghalayan society. Conducted interviews with judges, prosecutors, DLSA members, police officers, and victims across multiple districts.</div>
+          <div class="proj-tags"><span class="exp-tag green">Field Research</span><span class="exp-tag">Human Rights</span><span class="exp-tag gold">Policy</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer>© 2025 <span>Shreyansh Upadhyay</span> · B.S. LL.B. · National Law University Meghalaya</footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE: PUBLICATIONS ═══ -->
+<div id="page-publications" class="page">
+  <section class="section">
+    <div class="container">
+      <div class="section-label">06 · Publications</div>
+      <h2 class="section-title">Academic <span class="gold">Library</span></h2>
+      <p class="section-sub" style="margin-bottom:3rem;">Contributing to the discourse on legal technology, AI liability, and constitutional jurisprudence.</p>
+      <div class="pub-library">
+        <div class="pub-card anim-fade-up">
+          <div class="pub-icon">📜</div>
+          <div class="pub-body">
+            <div class="pub-type">International Publication</div>
+            <div class="pub-title">Navigating Liability in Autonomous Robots: Legal and Ethical Challenges in Manufacturing and Military Applications</div>
+            <div class="pub-venue">Yale Review of International Studies · YRIS</div>
+            <div style="font-size:.78rem;color:var(--muted);margin-top:.6rem;line-height:1.6;">Examines the complex liability landscape for autonomous robotic systems across two high-stakes domains — manufacturing and military operations — and proposes a multi-layered legal framework bridging existing tort law with emerging AI governance norms.</div>
+          </div>
+          <a href="https://yris.yira.org/author/shreyansh-upadhyay/" target="_blank" class="pub-link">Read →</a>
+        </div>
+        <div class="pub-card anim-fade-up">
+          <div class="pub-icon blue-icon">⚖️</div>
+          <div class="pub-body">
+            <div class="pub-type blue">Legal Article</div>
+            <div class="pub-title">Supreme Court Judgement on Delays in Death Sentence Execution</div>
+            <div class="pub-venue">Mentblue · Legal Blog</div>
+            <div style="font-size:.78rem;color:var(--muted);margin-top:.6rem;line-height:1.6;">Analyses the Supreme Court's landmark ruling on inordinate delays in executing death sentences, exploring constitutional dimensions under Article 21 and the evolving judicial approach to capital punishment.</div>
+          </div>
+          <a href="#" class="pub-link">Read →</a>
+        </div>
+        <div class="pub-card anim-fade-up">
+          <div class="pub-icon blue-icon">🏛️</div>
+          <div class="pub-body">
+            <div class="pub-type blue">Legal Commentary</div>
+            <div class="pub-title">Small Bribes, Big Consequences: Supreme Court's Bold Stand Against Corruption</div>
+            <div class="pub-venue">Mentblue · Legal Blog</div>
+            <div style="font-size:.78rem;color:var(--muted);margin-top:.6rem;line-height:1.6;">A critical commentary on the Supreme Court's expansive interpretation of the Prevention of Corruption Act, examining how judicial activism is reshaping anti-corruption enforcement in India's public sector.</div>
+          </div>
+          <a href="#" class="pub-link">Read →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer>© 2025 <span>Shreyansh Upadhyay</span> · B.S. LL.B. · National Law University Meghalaya</footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE: RESEARCH ═══ -->
+<div id="page-research" class="page">
+  <section class="section">
+    <div class="container">
+      <div class="section-label">07 · Research Fieldwork</div>
+      <h2 class="section-title">Field <span class="blue">Intelligence</span></h2>
+      <p class="section-sub" style="margin-bottom:3rem;">On-ground research across Meghalaya — gathering primary data on domestic violence, matrilineal law, and tribal justice systems.</p>
+      <div class="research-grid">
+        <div>
+          <div class="map-container">
+            <div class="map-title">📍 Research Districts — Meghalaya, India</div>
+            <svg class="meg-map" viewBox="0 0 400 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g id="districts">
+                <polygon class="district" id="d-east-khasi" points="190,80 230,70 260,90 255,130 220,145 185,130 175,105" onclick="showDistrict('east-khasi')"/>
+                <text class="district-label" x="210" y="115" text-anchor="middle">East Khasi Hills</text>
+                <polygon class="district" id="d-west-khasi" points="120,75 175,70 190,80 185,130 155,150 110,140 95,110" onclick="showDistrict('west-khasi')"/>
+                <text class="district-label" x="145" y="115" text-anchor="middle">West Khasi Hills</text>
+                <polygon class="district" id="d-east-jaintia" points="260,90 310,80 330,100 320,140 280,150 255,130" onclick="showDistrict('east-jaintia')"/>
+                <text class="district-label" x="295" y="120" text-anchor="middle">East Jaintia Hills</text>
+                <polygon class="district" id="d-ri-bhoi" points="175,70 220,55 250,65 260,90 230,70 190,80" onclick="showDistrict('ri-bhoi')"/>
+                <text class="district-label" x="215" y="72" text-anchor="middle">Ri Bhoi</text>
+                <polygon class="district" id="d-west-garo" points="40,140 95,130 110,140 120,180 80,200 40,185" onclick="showDistrict('west-garo')"/>
+                <text class="district-label" x="78" y="168" text-anchor="middle">West Garo Hills</text>
+                <polygon class="district" id="d-east-garo" points="120,140 155,150 165,185 140,210 120,200 100,175" onclick="showDistrict('east-garo')"/>
+                <text class="district-label" x="133" y="178" text-anchor="middle">East Garo</text>
+              </g>
+              <g class="map-pin" onclick="showDistrict('east-khasi')"><circle cx="215" cy="110" r="5" fill="#F59E0B" opacity="0.9"/><circle cx="215" cy="110" r="10" fill="#F59E0B" opacity="0.2"/></g>
+              <g class="map-pin" onclick="showDistrict('west-khasi')"><circle cx="145" cy="112" r="5" fill="#22C55E" opacity="0.9"/><circle cx="145" cy="112" r="10" fill="#22C55E" opacity="0.2"/></g>
+              <g class="map-pin" onclick="showDistrict('east-jaintia')"><circle cx="295" cy="118" r="5" fill="#3B82F6" opacity="0.9"/><circle cx="295" cy="118" r="10" fill="#3B82F6" opacity="0.2"/></g>
+              <g><circle cx="30" cy="245" r="4" fill="#F59E0B"/><text class="district-label" x="40" y="249">Interviews conducted</text><circle cx="30" cy="260" r="4" fill="#22C55E"/><text class="district-label" x="40" y="264">Community visits</text><circle cx="30" cy="275" r="4" fill="#3B82F6"/><text class="district-label" x="40" y="279">Court observations</text></g>
+            </svg>
+            <div class="district-info" id="districtInfo"><div class="di-title">Click a district to see field research details</div>Interactive map — click any highlighted district to explore research data from that location.</div>
+          </div>
+        </div>
+        <div>
+          <div class="section-label">Field Research Metrics</div>
+          <div class="research-stats">
+            <div class="rs-card anim-fade-up"><div class="rs-num">6+</div><div class="rs-label">Districts Visited</div><div class="rs-desc">Extensive field coverage across Meghalaya's tribal districts including Khasi Hills, Jaintia Hills, and Garo Hills regions.</div></div>
+            <div class="rs-card anim-fade-up"><div class="rs-num" style="color:var(--gold);">50+</div><div class="rs-label">Stakeholder Interviews</div><div class="rs-desc">Judges, prosecutors, DLSA members, police officers, victims, and community stakeholders — a multi-perspective dataset.</div></div>
+            <div class="rs-card anim-fade-up"><div class="rs-num" style="color:var(--blue);">1</div><div class="rs-label">Research Publication (Forthcoming)</div><div class="rs-desc">Findings structured for policy recommendations and academic publication in collaboration with WBNUJS.</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="research-findings">
+        <div class="scale-divider">Key Research Findings</div>
+        <div class="finding-cards">
+          <div class="finding-card anim-fade-up"><span class="fc-icon">🏘️</span><div class="fc-title">Cultural Context</div><div class="fc-desc">Explored unique intersection of matrilineal inheritance systems with domestic violence legal frameworks, revealing gaps in existing law.</div></div>
+          <div class="finding-card anim-fade-up"><span class="fc-icon">⚖️</span><div class="fc-title">Legal Gaps</div><div class="fc-desc">Identified under-reporting patterns and barriers to justice access specific to tribal women within matrilineal social structures.</div></div>
+          <div class="finding-card anim-fade-up"><span class="fc-icon">📋</span><div class="fc-title">Policy Implications</div><div class="fc-desc">Developed data-driven recommendations for tailored legal interventions respecting cultural frameworks while ensuring protection.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer>© 2025 <span>Shreyansh Upadhyay</span> · B.S. LL.B. · National Law University Meghalaya</footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE: LEADERSHIP ═══ -->
+<div id="page-leadership" class="page">
+  <section class="section">
+    <div class="container">
+      <div class="section-label">08 · Leadership & Achievements</div>
+      <h2 class="section-title">Beyond the <span class="gold">Courtroom</span></h2>
+      <p class="section-sub" style="margin-bottom:3rem;">Academic excellence combined with institutional leadership — shaping the next generation of legal education.</p>
+      <div class="achievement-grid">
+        <div class="ach-card anim-fade-up"><div class="ach-badge">🏆</div><div class="ach-title">Winner & Best Researcher</div><div class="ach-org">1st Intra Moot Court · NLU Meg</div><div class="ach-desc">Emerged as winner and Best Researcher in the inaugural Intra Moot Court Competition of National Law University Meghalaya.</div></div>
+        <div class="ach-card anim-fade-up"><div class="ach-badge blue">⚖️</div><div class="ach-title">Quarter Finalist</div><div class="ach-org">38th BCI National Moot · 2026</div><div class="ach-desc">Reached Quarter Finals of the 38th Bar Council of India National All India Inter-University Moot Court Competition.</div></div>
+        <div class="ach-card anim-fade-up"><div class="ach-badge">🌐</div><div class="ach-title">International Moot Participant</div><div class="ach-org">1st KIIT International · 2025</div><div class="ach-desc">Represented NLU Meghalaya at the 1st KIIT International Moot Court Competition 2025.</div></div>
+        <div class="ach-card anim-fade-up"><div class="ach-badge blue">🎙️</div><div class="ach-title">Moderator & Rapporteur</div><div class="ach-org">3rd Tech Law Dialogues</div><div class="ach-desc">Served as moderator and rapporteur at the 3rd Tech Law Dialogues, facilitating discussion on legal technology developments.</div></div>
+        <div class="ach-card anim-fade-up"><div class="ach-badge">🎓</div><div class="ach-title">National Conference Organizer</div><div class="ach-org">Era of Disruption Conference</div><div class="ach-desc">Organized "Era of Disruption: Exploring the Future" — a futuristic two-day national conference on law and technology.</div></div>
+        <div class="ach-card anim-fade-up"><div class="ach-badge blue">📚</div><div class="ach-title">IPR Symposium Organizer</div><div class="ach-org">Tech Transfer & IPR · 2024</div><div class="ach-desc">Organized Call for Papers and the Tech Transfer & IPR Symposium 2024 at NLU Meghalaya.</div></div>
+      </div>
+      <div class="scale-divider" style="margin-top:3rem;">Leadership Positions</div>
+      <div class="leadership-positions">
+        <div class="lp-card anim-fade-up"><div class="lp-icon">⚖️</div><div><div class="lp-role">Co-Convenor</div><div class="lp-org">Moot Court Society · NLU Meghalaya</div></div></div>
+        <div class="lp-card anim-fade-up"><div class="lp-icon">💰</div><div><div class="lp-role">Treasurer</div><div class="lp-org">Career Development Cell · NLU Meghalaya</div></div></div>
+        <div class="lp-card anim-fade-up"><div class="lp-icon">🛡️</div><div><div class="lp-role">Welfare Secretary</div><div class="lp-org">Student Council · NLU Meghalaya</div></div></div>
+        <div class="lp-card anim-fade-up"><div class="lp-icon">🌐</div><div><div class="lp-role">Institutions Outreach Head</div><div class="lp-org">Conferences / Workshops / STCs</div></div></div>
+      </div>
+    </div>
+  </section>
+  <footer>© 2025 <span>Shreyansh Upadhyay</span> · B.S. LL.B. · National Law University Meghalaya</footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE: LEGAL TECH LAB ═══ -->
+<div id="page-lab" class="page">
+  <section class="section">
+    <div class="container">
+      <div class="lab-header">
+        <div class="lab-badge">⚗️ Interactive · Live AI Tools</div>
+        <div class="lab-title">Legal Technology Laboratory</div>
+        <div class="lab-sub">Experimental AI-powered tools demonstrating the intersection of law and data science</div>
+      </div>
+
+      <!-- ROW 1: Classic tools -->
+      <div class="tools-grid">
+
+        <!-- TOOL 1: Keyword Extractor -->
+        <div class="tool-card">
+          <div class="tool-header"><div class="tool-num">01</div><div class="tool-name">Legal Keyword Extractor</div><div class="tool-tag">Live Tool</div></div>
+          <div class="tool-body">
+            <div class="tool-desc">Paste any legal judgment or contract text. The tool highlights key legal terms, Latin phrases, and important legal concepts.</div>
+            <textarea class="lab-textarea" id="kwInput" placeholder="Paste judgment text here... e.g. 'The writ petition is hereby dismissed. The petitioner failed to establish locus standi. The respondent's habeas corpus application was found to be maintainable under Article 226...'"></textarea>
+            <button class="lab-btn" onclick="extractKeywords()">⚡ Extract Legal Terms</button>
+            <div class="lab-result" id="kwResult"></div>
+          </div>
+        </div>
+
+        <!-- TOOL 2: Judgment Analyzer -->
+        <div class="tool-card">
+          <div class="tool-header"><div class="tool-num">02</div><div class="tool-name">Judgment Analyzer</div><div class="tool-tag">Live Tool</div></div>
+          <div class="tool-body">
+            <div class="tool-desc">Analyzes text complexity, citation density, and readability score of legal documents for quick assessment.</div>
+            <textarea class="lab-textarea" id="analyzeInput" placeholder="Paste judgment or legal text to analyze..." style="min-height:80px;"></textarea>
+            <button class="lab-btn" onclick="analyzeJudgment()">📊 Analyze Document</button>
+            <div class="analyzer-results" id="analyzeResult" style="display:none;">
+              <div class="ar-item"><div class="ar-val" id="ar-words">0</div><div class="ar-key">Word Count</div></div>
+              <div class="ar-item"><div class="ar-val" id="ar-complexity">–</div><div class="ar-key">Complexity</div></div>
+              <div class="ar-item"><div class="ar-val" id="ar-citations">0</div><div class="ar-key">Citations</div></div>
+              <div class="ar-item"><div class="ar-val" id="ar-sentences">0</div><div class="ar-key">Sentences</div></div>
+              <div class="ar-item"><div class="ar-val" id="ar-readability">–</div><div class="ar-key">Readability</div></div>
+              <div class="ar-item"><div class="ar-val" id="ar-legal-density">0%</div><div class="ar-key">Legal Density</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TOOL 3: Legal Trend Chart -->
+        <div class="tool-card">
+          <div class="tool-header"><div class="tool-num">03</div><div class="tool-name">Legal Case Distribution</div><div class="tool-tag">Visualization</div></div>
+          <div class="tool-body">
+            <div class="tool-desc">Visual representation of case type distribution in Indian courts, based on published statistical data.</div>
+            <div class="chart-container"><canvas id="legalChart"></canvas></div>
+            <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.8rem;">
+              <button class="lab-btn" style="font-size:.6rem;padding:.4rem .8rem;" onclick="updateChart('civil')">Civil</button>
+              <button class="lab-btn" style="font-size:.6rem;padding:.4rem .8rem;" onclick="updateChart('criminal')">Criminal</button>
+              <button class="lab-btn" style="font-size:.6rem;padding:.4rem .8rem;" onclick="updateChart('constitutional')">Constitutional</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end tools-grid row 1 -->
+
+      <!-- DIVIDER -->
+      <div class="scale-divider" style="margin:3rem 0;">AI-POWERED TOOLS</div>
+
+      <!-- ROW 2: AI Tools -->
+      <div class="tools-grid">
+
+        <!-- TOOL 4: AI Judgment Summarizer -->
+        <div class="tool-card" style="grid-column:span 1;">
+          <div class="tool-header">
+            <div class="tool-num" style="background:var(--blue-dim);border-color:rgba(59,130,246,.3);color:var(--blue);">04</div>
+            <div class="tool-name">AI Judgment Summarizer</div>
+            <div class="tool-tag ai-tag">⚡ AI Powered</div>
+          </div>
+          <div class="tool-body">
+            <div class="tool-desc">Paste a legal judgment. AI extracts and structures the <strong style="color:var(--text);">Facts, Issues, Arguments & Judgment</strong> into a clean summary dashboard.</div>
+            <textarea class="lab-textarea" id="summarizerInput" placeholder="Paste a judgment or legal case text here..." style="min-height:120px;"></textarea>
+            <button class="lab-btn ai-btn" onclick="summarizeJudgment()" id="summarizeBtn">🤖 Summarize with AI</button>
+            <div id="summarizerLoading" style="display:none;" class="ai-loading">
+              <div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>
+              <span>analyzing the judgment...</span>
+            </div>
+            <div class="summary-grid" id="summaryOutput"></div>
+          </div>
+        </div>
+
+        <!-- TOOL 5: AI Courtroom Simulator -->
+        <div class="tool-card" style="grid-column:span 1;">
+          <div class="tool-header">
+            <div class="tool-num" style="background:var(--gold-dim);border-color:rgba(245,158,11,.3);color:var(--gold);">05</div>
+            <div class="tool-name">AI Courtroom Simulator</div>
+            <div class="tool-tag ai-tag">⚡ AI Powered</div>
+          </div>
+          <div class="tool-body">
+            <div class="tool-desc">Describe your case scenario. Simulates a structured legal analysis covering issues, applicable law, likely outcome, and risk assessment.</div>
+            <textarea class="lab-textarea" id="courtroomInput" placeholder="Describe your case scenario, e.g. 'A tenant is evicted without notice in violation of a rental agreement in Rajasthan. The landlord claims force majeure...'" style="min-height:120px;"></textarea>
+            <button class="lab-btn ai-btn" onclick="simulateCourtroom()" id="courtroomBtn" style="background:var(--gold-dim);color:var(--gold);border-color:rgba(245,158,11,.3);">⚖️ Simulate Courtroom</button>
+            <div id="courtroomLoading" style="display:none;" class="ai-loading">
+              <div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>
+              <span>Analyzing the case...</span>
+            </div>
+            <div id="courtroomOutput" class="courtroom-output"></div>
+          </div>
+        </div>
+
+      </div><!-- end tools-grid row 2 -->
+
+      <!-- KNOWLEDGE GRAPH -->
+      <div class="scale-divider" style="margin:3rem 0;">LEGAL KNOWLEDGE GRAPH · Interactive</div>
+      <div class="kg-wrap anim-fade-up">
+        <div class="kg-toolbar">
+          <span class="kg-title">🕸️ Legal Domain Knowledge Graph</span>
+          <div class="kg-legend">
+            <div class="kg-legend-item"><div class="kg-dot" style="background:#3B82F6;"></div>Cases/Projects</div>
+            <div class="kg-legend-item"><div class="kg-dot" style="background:#F59E0B;"></div>Publications</div>
+            <div class="kg-legend-item"><div class="kg-dot" style="background:#22C55E;"></div>Legal Domains</div>
+            <div class="kg-legend-item"><div class="kg-dot" style="background:#A78BFA;"></div>Statutes</div>
+          </div>
+        </div>
+        <div id="knowledge-graph"></div>
+        <div class="kg-tooltip" id="kgTooltip"></div>
+      </div>
+
+    </div>
+  </section>
+  <footer>© 2025 <span>Shreyansh Upadhyay</span> · B.S. LL.B. · National Law University Meghalaya</footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE: CONTACT ═══ -->
+<div id="page-contact" class="page">
+  <section class="section">
+    <div class="container">
+      <div class="contact-wrap">
+        <div class="contact-header">
+          <div class="legal-seal"><div class="seal-inner"><span class="seal-icon">⚖️</span><span class="seal-text">SU · NLU MEG</span></div></div>
+          <div class="section-label" style="justify-content:center;">09 · Contact</div>
+          <h2 class="section-title" style="font-size:2.5rem;">Let's <span class="gold">Connect</span></h2>
+          <p class="section-sub" style="margin:1rem auto;text-align:center;">Available for internships, research collaborations, and conversations at the intersection of law and technology.</p>
+        </div>
+        <div class="contact-grid">
+          <div class="contact-info">
+            <div class="section-label">Get In Touch</div>
+            <div class="contact-links">
+              <a href="tel:+917905013233" class="c-link"><div class="c-link-icon">📞</div><div><span class="c-link-lbl">Phone</span><span class="c-link-val">+91 7905013233</span></div></a>
+              <a href="mailto:shreyansh.u@nlumeg.ac.in" class="c-link"><div class="c-link-icon">✉️</div><div><span class="c-link-lbl">Email</span><span class="c-link-val">shreyansh.u@nlumeg.ac.in</span></div></a>
+              <a href="https://www.linkedin.com/in/shreyansh-upadhyay-5708aa216/" target="_blank" class="c-link"><div class="c-link-icon" style="background:rgba(10,102,194,.2);border-color:rgba(10,102,194,.3);font-family:serif;font-weight:700;color:#0A66C2;">in</div><div><span class="c-link-lbl">LinkedIn</span><span class="c-link-val">Shreyansh Upadhyay</span></div></a>
+              <a href="https://drive.google.com/file/d/1L4-a05T4kY83rp9qN8UWdP88ZjTFHpcK/view?usp=sharing" download class="c-link"><div class="c-link-icon">📄</div><div><span class="c-link-lbl">Resume</span><span class="c-link-val">Download CV (PDF)</span></div></a>
+              <div class="c-link" style="cursor:default;"><div class="c-link-icon">📍</div><div><span class="c-link-lbl">Location</span><span class="c-link-val">Shillong, Meghalaya, India</span></div></div>
+            </div>
+          </div>
+          <div>
+            <div class="contact-form">
+              <div class="section-label" style="margin-bottom:1.2rem;">Send a Message</div>
+              <form id="contactForm" onsubmit="submitForm(event)">
+                <input type="hidden" name="access_key" value="b16e1340-ad99-4ddd-8357-7cc23af32b79">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                  <div class="cf-group"><label class="cf-label">Name</label><input type="text" name="name" class="cf-input" placeholder="Your name" required></div>
+                  <div class="cf-group"><label class="cf-label">Email</label><input type="email" name="email" class="cf-input" placeholder="your@email.com" required></div>
+                </div>
+                <div class="cf-group"><label class="cf-label">Subject</label><input type="text" name="subject" class="cf-input" placeholder="Internship / Research / Collaboration"></div>
+                <div class="cf-group"><label class="cf-label">Message</label><textarea name="message" class="cf-textarea" placeholder="Your message..." required></textarea></div>
+                <button type="submit" class="cf-submit">Send Message →</button>
+                <div id="cf-status"></div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer>© 2025 <span>Shreyansh Upadhyay</span> · B.S. LL.B. · National Law University Meghalaya</footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ JAVASCRIPT ═══ -->
+<script>
+// ─────────────────── CURSOR ───────────────────
+const dot = document.getElementById('curDot');
+const ring = document.getElementById('curRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});
+(function animRing(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing);})();
+document.querySelectorAll('a,button,[onclick],input,textarea').forEach(el=>{
+  el.addEventListener('mouseenter',()=>ring.classList.add('active'));
+  el.addEventListener('mouseleave',()=>ring.classList.remove('active'));
+});
+
+// ─────────────────── PARTICLES ───────────────────
+const canvas=document.getElementById('bg-canvas');
+const ctx=canvas.getContext('2d');
+let particles=[],pmouse={x:null,y:null};
+document.addEventListener('mousemove',e=>{pmouse.x=e.clientX;pmouse.y=e.clientY;});
+class P{constructor(){this.reset();}reset(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.bx=this.x;this.by=this.y;this.s=Math.random()*1.4+.3;this.d=Math.random()*30+5;this.vx=Math.random()*.25-.125;this.vy=Math.random()*.25-.125;}update(){if(pmouse.x){const dx=pmouse.x-this.x,dy=pmouse.y-this.y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<120){const f=(120-dist)/120;this.x-=(dx/dist)*f*this.d*.5;this.y-=(dy/dist)*f*this.d*.5;}else{this.x+=(this.bx-this.x)*.07;this.y+=(this.by-this.y)*.07;}}this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>canvas.width)this.vx*=-1;if(this.y<0||this.y>canvas.height)this.vy*=-1;}draw(){ctx.fillStyle='rgba(59,130,246,0.55)';ctx.beginPath();ctx.arc(this.x,this.y,this.s,0,Math.PI*2);ctx.fill();}}
+function initP(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;particles=[];const n=Math.min(Math.floor(canvas.width*canvas.height/7000),200);for(let i=0;i<n;i++)particles.push(new P());}
+function drawConnections(){const md=(canvas.width/5.5)*(canvas.height/5.5);for(let a=0;a<particles.length;a++){for(let b=a+1;b<particles.length;b++){const dx=particles[a].x-particles[b].x,dy=particles[a].y-particles[b].y,d2=dx*dx+dy*dy;if(d2<md){const alpha=(1-d2/md)*.15;ctx.strokeStyle=`rgba(59,130,246,${alpha})`;ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(particles[a].x,particles[a].y);ctx.lineTo(particles[b].x,particles[b].y);ctx.stroke();}}}}
+function animP(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.update();p.draw();});drawConnections();requestAnimationFrame(animP);}
+initP();animP();window.addEventListener('resize',initP);
+
+// ─────────────────── PAGE NAVIGATION ───────────────────
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pg=document.getElementById('page-'+id);
+  if(pg){pg.classList.add('active');pg.scrollTop=0;window.scrollTo(0,0);}
+  document.querySelectorAll('[data-page]').forEach(a=>a.classList.remove('active'));
+  const al=document.querySelector(`[data-page="${id}"]`);
+  if(al)al.classList.add('active');
+  setTimeout(()=>triggerAnims(pg),100);
+  if(id==='about')setTimeout(()=>{animateBars();initRadarChart();},200);
+  if(id==='data')setTimeout(animateDSBars,200);
+  if(id==='home')setTimeout(animateCounters,300);
+  if(id==='lab')setTimeout(()=>{initChart();initKnowledgeGraph();},300);
+}
+
+// ─────────────────── ANIMATIONS ───────────────────
+function triggerAnims(container){if(!container)return;container.querySelectorAll('.anim-fade-up').forEach((el,i)=>{setTimeout(()=>el.classList.add('in'),i*80);});}
+setTimeout(()=>triggerAnims(document.getElementById('page-home')),100);
+setTimeout(animateCounters,400);
+
+// ─────────────────── MOBILE MENU ───────────────────
+function toggleMobileMenu(){document.getElementById('mobileMenu').classList.toggle('open');}
+
+// ─────────────────── COUNTERS ───────────────────
+function animateCounters(){document.querySelectorAll('[data-target]').forEach(el=>{const target=parseInt(el.dataset.target);let current=0;const step=target/40;const timer=setInterval(()=>{current+=step;if(current>=target){current=target;clearInterval(timer);}el.textContent=Math.floor(current)+(target>10?'+':'');},40);});}
+
+// ─────────────────── SKILL BARS ───────────────────
+function animateBars(){document.querySelectorAll('.skill-bar-fill').forEach(el=>{el.style.width=el.dataset.w+'%';});}
+function animateDSBars(){document.querySelectorAll('.ds-fill').forEach(el=>{el.style.width=el.dataset.w+'%';});}
+
+// ─────────────────── RADAR CHART ───────────────────
+let radarInstance=null;
+function initRadarChart(){
+  const c=document.getElementById('radarChart');
+  if(!c)return;
+  if(radarInstance){radarInstance.destroy();radarInstance=null;}
+  radarInstance=new Chart(c,{
+    type:'radar',
+    data:{
+      labels:['Legal Research','Legal Drafting','Policy Analysis','Python/DS','Machine Learning','Mooting/Speaking'],
+      datasets:[{
+        label:'Competency',
+        data:[92,88,85,72,65,90],
+        backgroundColor:'rgba(59,130,246,0.15)',
+        borderColor:'rgba(59,130,246,0.8)',
+        pointBackgroundColor:'#F59E0B',
+        pointBorderColor:'#F59E0B',
+        pointHoverRadius:6,
+        borderWidth:2
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{r:{
+        angleLines:{color:'rgba(255,255,255,0.06)'},
+        grid:{color:'rgba(255,255,255,0.06)'},
+        pointLabels:{color:'#94A3B8',font:{size:10,family:'JetBrains Mono'}},
+        ticks:{display:false},
+        min:0,max:100
+      }}
+    }
+  });
+}
+
+// ─────────────────── DISTRICT MAP ───────────────────
+const districtData={'east-khasi':{title:'East Khasi Hills (Shillong)',info:'Capital district. Conducted interviews with High Court judges, public prosecutors, and DLSA officials. 15+ stakeholder interviews recorded.'},'west-khasi':{title:'West Khasi Hills',info:'Field visits to tribal community councils (Dorbar Shnong). Documented customary law practices and their interaction with DV Act provisions. 8 community interviews.'},'east-jaintia':{title:'East Jaintia Hills',info:'Court observation sessions at district courts. Reviewed DV case files and analyzed patterns in case disposal rates under matrilineal social structures.'},'ri-bhoi':{title:'Ri Bhoi District',info:'Interviews with DLSA members and legal aid lawyers on access to justice challenges for tribal women in domestic violence cases.'},'west-garo':{title:'West Garo Hills',info:'Research on Garo matrilineal system (Bilik inheritance). Documented differences from Khasi customary law and its legal implications.'},'east-garo':{title:'East Garo Hills',info:'Community visits and interviews with women\'s rights NGOs. Gathered data on DV reporting rates and support infrastructure.'}};
+function showDistrict(id){const d=districtData[id];if(!d)return;document.getElementById('districtInfo').innerHTML=`<div class="di-title">${d.title}</div>${d.info}`;document.querySelectorAll('.district').forEach(el=>el.classList.remove('active'));const el=document.getElementById('d-'+id);if(el)el.classList.add('active');}
+
+// ─────────────────── KEYWORD EXTRACTOR ───────────────────
+const legalKeywords=['writ','petition','respondent','petitioner','habeas corpus','mandamus','certiorari','locus standi','ratio decidendi','obiter dicta','sub judice','mens rea','actus reus','res judicata','prima facie','suo motu','ultra vires','bona fide','de facto','de jure','affidavit','pleading','injunction','stay order','adjournment','remand','bail','conviction','acquittal','appeal','revision','review','article 226','article 32','constitutional','fundamental rights','statutory','jurisdiction','maintainable','dismissed','allowed','plaintiff','defendant','inter alia','qua','viz','ibid','hereinabove','notwithstanding','ipc','crpc','cpc','iea','rti','pil','sc','hc','tribunal','section','clause','sub-section','schedule','enactment','notification','gazette','amendment','ordinance','promulgated','enforced','operative'];
+function extractKeywords(){const text=document.getElementById('kwInput').value.trim();if(!text){document.getElementById('kwResult').innerHTML='<span style="color:var(--muted);font-size:.8rem;">Please paste some legal text first.</span>';return;}let highlighted=text;let found=[];legalKeywords.forEach(kw=>{const re=new RegExp('\\b('+kw+')\\b','gi');if(re.test(text)){found.push(kw);highlighted=highlighted.replace(new RegExp('\\b('+kw+')\\b','gi'),`<span class="keyword-highlight">$1</span>`);}});document.getElementById('kwResult').innerHTML=`<div style="font-size:.72rem;color:var(--green);margin-bottom:.5rem;font-family:'JetBrains Mono',monospace;">✓ Found ${found.length} legal term(s): ${found.slice(0,8).join(', ')}${found.length>8?'...':''}</div><div style="font-size:.78rem;line-height:1.8;color:var(--muted);background:var(--navy2);padding:.8rem;border-radius:4px;border:1px solid var(--border);max-height:150px;overflow-y:auto;">${highlighted}</div>`;}
+
+// ─────────────────── JUDGMENT ANALYZER ───────────────────
+function analyzeJudgment(){const text=document.getElementById('analyzeInput').value.trim();if(!text)return;const words=text.split(/\s+/).filter(w=>w.length>0).length;const sentences=text.split(/[.!?]+/).filter(s=>s.trim().length>0).length;const avgWordsPerSent=sentences>0?Math.round(words/sentences):0;const citations=(text.match(/\(\d{4}\)|\[\d{4}\]|AIR\s+\d{4}|SCC|SCR|\bv\.\s+/g)||[]).length;const legalWordCount=legalKeywords.filter(kw=>new RegExp('\\b'+kw+'\\b','i').test(text)).length;const legalDensity=words>0?Math.round((legalWordCount/words)*100*10):0;let complexity='Low';if(avgWordsPerSent>25)complexity='High';else if(avgWordsPerSent>15)complexity='Medium';let readability='Simple';if(avgWordsPerSent>25)readability='Complex';else if(avgWordsPerSent>15)readability='Moderate';document.getElementById('ar-words').textContent=words;document.getElementById('ar-complexity').textContent=complexity;document.getElementById('ar-citations').textContent=citations;document.getElementById('ar-sentences').textContent=sentences;document.getElementById('ar-readability').textContent=readability;document.getElementById('ar-legal-density').textContent=legalDensity+'%';document.getElementById('analyzeResult').style.display='grid';}
+
+// ─────────────────── BAR CHART ───────────────────
+let chartInstance=null;
+const chartData={civil:{labels:['Property','Contract','Matrimonial','Tort','Succession'],data:[35,25,20,12,8],color:'rgba(59,130,246,0.7)'},criminal:{labels:['IPC Offenses','NDPS','POCSO','Corruption','Cybercrime'],data:[45,18,15,12,10],color:'rgba(245,158,11,0.7)'},constitutional:{labels:['Fundamental Rights','Service Law','Election','Taxation','Environment'],data:[40,22,15,13,10],color:'rgba(34,197,94,0.7)'}};
+function initChart(){const c=document.getElementById('legalChart');if(!c)return;if(chartInstance&&chartInstance.destroy)chartInstance.destroy();updateChart('civil');}
+function updateChart(type){const c=document.getElementById('legalChart');if(!c)return;const ctx2=c.getContext('2d');const d=chartData[type];if(chartInstance&&chartInstance.destroy)chartInstance.destroy();c.width=c.offsetWidth||340;c.height=160;const pw=c.width,ph=c.height,n=d.data.length;const barW=Math.floor((pw-60)/(n*1.5));const maxVal=Math.max(...d.data);const gap=(pw-60-barW*n)/(n+1);d.data.forEach((v,i)=>{const x=30+gap+(barW+gap)*i;const barH=Math.floor((v/maxVal)*(ph-40));const y=ph-25-barH;const grad=ctx2.createLinearGradient(0,y,0,y+barH);grad.addColorStop(0,d.color);grad.addColorStop(1,d.color.replace('0.7','0.2'));ctx2.fillStyle=grad;ctx2.fillRect(x,y,barW,barH);ctx2.fillStyle='rgba(148,163,184,0.8)';ctx2.font='7px JetBrains Mono, monospace';ctx2.textAlign='center';const label=d.labels[i];const words2=label.split(' ');words2.forEach((w,wi)=>ctx2.fillText(w,x+barW/2,ph-10+(wi*8)));ctx2.fillStyle=d.color;ctx2.font='bold 9px JetBrains Mono, monospace';ctx2.fillText(v+'%',x+barW/2,y-4);});chartInstance={destroy:()=>ctx2.clearRect(0,0,c.width,c.height)};}
+
+// ─────────────────── AI JUDGMENT SUMMARIZER ───────────────────
+async function summarizeJudgment(){
+  const text=document.getElementById('summarizerInput').value.trim();
+  if(!text||text.length<50){alert('Please paste a longer legal text (at least 50 characters).');return;}
+  document.getElementById('summarizeBtn').disabled=true;
+  document.getElementById('summarizerLoading').style.display='flex';
+  document.getElementById('summaryOutput').innerHTML='';
+  const prompt=`You are a legal analyst. Analyze this legal text and extract exactly 4 sections. Return ONLY a JSON object with these exact keys: "facts", "issues", "arguments", "judgment". Each value should be a concise 2-3 sentence summary. Return only valid JSON, no markdown, no other text.
+
+Legal text:
+${text.substring(0,3000)}`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const data=await res.json();
+    const raw=data.content.map(i=>i.text||'').join('');
+    const clean=raw.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+    const sections=[
+      {key:'facts',label:'📋 Facts',cls:'facts',color:'var(--blue)'},
+      {key:'issues',label:'❓ Issues',cls:'issues',color:'var(--gold)'},
+      {key:'arguments',label:'⚔️ Arguments',cls:'args',color:'#A78BFA'},
+      {key:'judgment',label:'⚖️ Judgment',cls:'judgment',color:'var(--green)'}
+    ];
+    const html=sections.map(s=>`<div class="summary-card"><div class="summary-card-label ${s.cls}" style="color:${s.color}">${s.label}</div><div class="summary-card-content">${parsed[s.key]||'Not identified'}</div></div>`).join('');
+    document.getElementById('summaryOutput').innerHTML=html;
+    setTimeout(()=>{document.querySelectorAll('.summary-card').forEach((el,i)=>{setTimeout(()=>el.classList.add('revealed'),i*120);});},50);
+  }catch(e){
+    document.getElementById('summaryOutput').innerHTML=`<div style="color:#f87171;font-size:.82rem;padding:1rem;grid-column:1/-1;">Error analyzing text. Please try again with a cleaner legal text.</div>`;
+  }
+  document.getElementById('summarizerLoading').style.display='none';
+  document.getElementById('summarizeBtn').disabled=false;
+}
+
+// ─────────────────── AI COURTROOM SIMULATOR ───────────────────
+async function simulateCourtroom(){
+  const text=document.getElementById('courtroomInput').value.trim();
+  if(!text||text.length<30){alert('Please describe a case scenario first.');return;}
+  document.getElementById('courtroomBtn').disabled=true;
+  document.getElementById('courtroomLoading').style.display='flex';
+  document.getElementById('courtroomOutput').innerHTML='';
+  const prompt=`You are an Indian legal expert. Analyze this case scenario and return ONLY a JSON object with exactly these keys: "issues" (array of 2-3 strings), "laws" (array of 2-3 applicable statutes/articles), "outcome" (one sentence prediction), "risk" (a number 1-100 representing litigation risk), "riskLabel" (Low/Medium/High). Return only valid JSON.
+
+Case: ${text.substring(0,2000)}`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:prompt}]})});
+    const data=await res.json();
+    const raw=data.content.map(i=>i.text||'').join('');
+    const clean=raw.replace(/```json|```/g,'').trim();
+    const p=JSON.parse(clean);
+    const riskColor=p.risk>66?'#f87171':p.risk>33?'var(--gold)':'var(--green)';
+    const sections=[
+      {color:'var(--blue)',label:'⚖️ Legal Issues Identified',content:`<ul style="list-style:none;display:flex;flex-direction:column;gap:.4rem;">${(p.issues||[]).map(i=>`<li style="font-size:.8rem;color:var(--muted);padding-left:1rem;position:relative;"><span style="position:absolute;left:0;color:var(--blue);">›</span>${i}</li>`).join('')}</ul>`},
+      {color:'#A78BFA',label:'📜 Applicable Laws & Statutes',content:`<ul style="list-style:none;display:flex;flex-direction:column;gap:.4rem;">${(p.laws||[]).map(l=>`<li style="font-size:.8rem;color:var(--muted);padding-left:1rem;position:relative;"><span style="position:absolute;left:0;color:#A78BFA;">›</span>${l}</li>`).join('')}</ul>`},
+      {color:'var(--green)',label:'🔮 Likely Outcome',content:`<div style="font-size:.82rem;color:var(--muted);">${p.outcome||'Outcome unclear based on provided facts.'}</div>`},
+      {color:riskColor,label:`⚡ Risk Assessment · ${p.riskLabel||'Medium'}`,content:`<div style="font-size:.78rem;color:var(--muted);margin-bottom:.4rem;">Litigation Risk Score: <strong style="color:${riskColor};">${p.risk}/100</strong></div><div class="risk-bar"><div class="risk-fill" style="width:0%;background:${riskColor};" data-risk="${p.risk}"></div></div>`}
+    ];
+    document.getElementById('courtroomOutput').innerHTML=sections.map(s=>`<div class="court-section"><div class="court-section-header" style="color:${s.color};">${s.label}</div><div class="court-section-body">${s.content}</div></div>`).join('');
+    setTimeout(()=>{
+      document.querySelectorAll('.court-section').forEach((el,i)=>{setTimeout(()=>el.classList.add('in'),i*150);});
+      setTimeout(()=>{document.querySelectorAll('.risk-fill').forEach(el=>{el.style.width=el.dataset.risk+'%';});},600);
+    },50);
+  }catch(e){
+    document.getElementById('courtroomOutput').innerHTML=`<div class="court-section in" style="border-color:rgba(248,113,113,.3);"><div style="color:#f87171;font-size:.82rem;">Error in simulation. Please try again with a more detailed case description.</div></div>`;
+  }
+  document.getElementById('courtroomLoading').style.display='none';
+  document.getElementById('courtroomBtn').disabled=false;
+}
+
+// ─────────────────── KNOWLEDGE GRAPH (D3) ───────────────────
+function initKnowledgeGraph(){
+  const container=document.getElementById('knowledge-graph');
+  if(!container||container.querySelector('svg'))return;
+  const w=container.offsetWidth||900,h=420;
+  const nodes=[
+    {id:'LIDSS',label:'LIDSS Project',type:'case',r:22,info:'IIT Kharagpur × NLU Meghalaya AI research system'},
+    {id:'DV Research',label:'DV Research',type:'case',r:18,info:'Field research on domestic violence in Meghalaya'},
+    {id:'YRIS',label:'YRIS Publication',type:'pub',r:16,info:'Navigating Liability in Autonomous Robots'},
+    {id:'Mentblue',label:'Mentblue Articles',type:'pub',r:14,info:'Supreme Court legal commentary'},
+    {id:'AI Law',label:'AI & Law',type:'domain',r:20,info:'Artificial Intelligence in Legal Systems'},
+    {id:'Human Rights',label:'Human Rights',type:'domain',r:18,info:'Tribal women rights, DV Act, matrilineal law'},
+    {id:'Corporate',label:'Corporate Law',type:'domain',r:16,info:'IBC 2016, RERA, Contract Law'},
+    {id:'Constitutional',label:'Constitutional',type:'domain',r:16,info:'Fundamental Rights, Writ Jurisdiction'},
+    {id:'IBC 2016',label:'IBC 2016',type:'statute',r:12,info:'Insolvency & Bankruptcy Code'},
+    {id:'RTI Act',label:'RTI Act 2005',type:'statute',r:12,info:'Right to Information Act'},
+    {id:'DV Act',label:'DV Act 2005',type:'statute',r:12,info:'Protection of Women from DV'},
+    {id:'Art 226',label:'Article 226',type:'statute',r:12,info:'Writ jurisdiction of High Courts'},
+  ];
+  const links=[
+    {source:'LIDSS',target:'AI Law'},{source:'LIDSS',target:'Constitutional'},
+    {source:'DV Research',target:'Human Rights'},{source:'DV Research',target:'DV Act'},
+    {source:'YRIS',target:'AI Law'},{source:'Mentblue',target:'Constitutional'},
+    {source:'AI Law',target:'Art 226'},{source:'Human Rights',target:'DV Act'},
+    {source:'Corporate',target:'IBC 2016'},{source:'Constitutional',target:'RTI Act'},
+    {source:'Constitutional',target:'Art 226'},{source:'LIDSS',target:'YRIS'},
+    {source:'DV Research',target:'Mentblue'}
+  ];
+  const colorMap={case:'#3B82F6',pub:'#F59E0B',domain:'#22C55E',statute:'#A78BFA'};
+  const svg=d3.select(container).append('svg').attr('width',w).attr('height',h);
+  svg.append('defs').append('marker').attr('id','arrow').attr('viewBox','0 -5 10 10').attr('refX',20).attr('refY',0).attr('markerWidth',6).attr('markerHeight',6).attr('orient','auto').append('path').attr('d','M0,-5L10,0L0,5').attr('fill','rgba(59,130,246,0.4)');
+  const sim=d3.forceSimulation(nodes)
+    .force('link',d3.forceLink(links).id(d=>d.id).distance(100).strength(0.5))
+    .force('charge',d3.forceManyBody().strength(-280))
+    .force('center',d3.forceCenter(w/2,h/2))
+    .force('collision',d3.forceCollide().radius(d=>d.r+15));
+  const link=svg.append('g').selectAll('line').data(links).join('line').attr('stroke','rgba(59,130,246,0.2)').attr('stroke-width',1);
+  const nodeG=svg.append('g').selectAll('g').data(nodes).join('g').call(d3.drag().on('start',(e,d)=>{if(!e.active)sim.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y;}).on('drag',(e,d)=>{d.fx=e.x;d.fy=e.y;}).on('end',(e,d)=>{if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null;}));
+  nodeG.append('circle').attr('r',d=>d.r).attr('fill',d=>colorMap[d.type]+'22').attr('stroke',d=>colorMap[d.type]).attr('stroke-width',1.5).style('cursor','pointer');
+  nodeG.append('text').text(d=>d.label).attr('text-anchor','middle').attr('dy',d=>d.r+12).attr('fill','#94A3B8').attr('font-size','9px').attr('font-family','JetBrains Mono, monospace').style('pointer-events','none');
+  const tooltip=document.getElementById('kgTooltip');
+  nodeG.on('mouseenter',(e,d)=>{const rect=container.getBoundingClientRect();tooltip.style.opacity='1';tooltip.style.left=(e.clientX-rect.left+10)+'px';tooltip.style.top=(e.clientY-rect.top-20)+'px';tooltip.innerHTML=`<strong style="color:${colorMap[d.type]}">${d.label}</strong><br><span style="font-size:.72rem;">${d.info}</span>`;}).on('mouseleave',()=>{tooltip.style.opacity='0';});
+  sim.on('tick',()=>{link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);nodeG.attr('transform',d=>`translate(${Math.max(d.r,Math.min(w-d.r,d.x))},${Math.max(d.r,Math.min(h-d.r,d.y))})`);});
+}
+
+// ─────────────────── CONTACT FORM ───────────────────
+async function submitForm(e){e.preventDefault();const status=document.getElementById('cf-status');status.innerHTML='<span style="color:var(--blue)">Sending...</span>';const data=Object.fromEntries(new FormData(e.target));try{const res=await fetch('https://api.web3forms.com/submit',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data)});const json=await res.json();if(res.status===200){status.innerHTML='<span style="color:var(--green)">✓ Message sent!</span>';e.target.reset();}else{status.innerHTML=`<span style="color:#f87171">${json.message}</span>`;}}catch{status.innerHTML='<span style="color:#f87171">Error. Please email directly.</span>';}setTimeout(()=>status.innerHTML='',8000);}
+
+// ─────────────────── INTERSECTION OBSERVER ───────────────────
+const io=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting)entry.target.classList.add('in');});},{threshold:.1});
+document.querySelectorAll('.anim-fade-up').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
